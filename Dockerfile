@@ -42,6 +42,9 @@ RUN git clone https://github.com/MIT-SPARK/TEASER-plusplus.git && \
     cd python && \
     pip3 install .
 
+# Fix issue with the version of numba in requirements.txt
+RUN pip3 install --upgrade numba
+
 # Create user
 ENV USER=${USER_NAME}
 RUN groupadd ${USER_NAME} --gid ${USER_GID}\
