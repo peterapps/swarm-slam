@@ -1,5 +1,7 @@
 # Swarm-SLAM
 
+A full ROS 2 Foxy development environment in a Ubuntu 20.04 Docker container, capable of running [Swarm-SLAM](https://github.com/MISTLab/Swarm-SLAM).
+
 ## Getting started
 
 First, clone this repository:
@@ -93,3 +95,17 @@ Then, run the unit tests with:
 ```bash
 colcon test
 ```
+
+## Datasets
+
+The Swarm-SLAM paper refers to eight sequences tested from five different datasets:
+| | # Robots | Sensors | Total Length (m) | Size (GB) |
+|----------------|----------|----------------|------------------|-----------|
+| [KITTI](https://www.cvlibs.net/datasets/kitti/) 00 | 2 | stereo | 3835 | 26.4 |
+| [KITTI-360](https://www.cvlibs.net/datasets/kitti-360/) 09 | 5 | lidar | 10714 | 26.9 |
+| [GrAco](https://sites.google.com/view/graco-dataset) Ground | 3 | lidar | 1427 | 72.9 |
+| [M2DGR](https://github.com/SJTU-ViSYS/M2DGR) Gate | 3 | lidar | 484 | 8.3 |
+| [S3E](https://github.com/PengYu-Team/S3E) Square | 3 | stereo & lidar | 2286 | 19.1 |
+| S3E College | 3 | stereo & lidar | 3335 | 31.7 |
+| S3E Playground | 3 | stereo & lidar | 1232 | 8.7 |
+| S3E Laboratory | 3 | stereo & lidar | 468 | 10.3 |
