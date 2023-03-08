@@ -109,3 +109,5 @@ The Swarm-SLAM paper refers to eight sequences tested from five different datase
 | S3E College | 3 | stereo & lidar | 3335 | 31.7 |
 | S3E Playground | 3 | stereo & lidar | 1232 | 8.7 |
 | S3E Laboratory | 3 | stereo & lidar | 468 | 10.3 |
+
+The [cslam_experiments](https://github.com/lajoiepy/cslam_experiments) repository, also included in this repository, contains launch files for testing Swarm-SLAM with these datasets.
