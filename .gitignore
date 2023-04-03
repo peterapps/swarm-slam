@@ -6,3 +6,5 @@ build/
 .trunk/
 *__pycache__/
 *__pycache__*
+
+ros1_data/
