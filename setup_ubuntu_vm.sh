@@ -1,5 +1,7 @@
 #!/bin/bash
 
+sudo apt install open-vm-tools open-vm-tools-desktop
+
 # Install ROS 2 Foxy
 sudo apt update
 sudo apt install -y --no-install-recommends dirmngr gnupg2 lsb-release
@@ -58,23 +60,4 @@ make teaserpp_python
 cd python
 pip3 install .
 
-tee -a ~/.bashrc <<EOF
-alias sros1="source /opt/ros/noetic/setup.bash"
-alias sros2="source /opt/ros/foxy/setup.bash"
-alias sws="source ~/ros_ws/install/setup.bash"
-alias cdws="cd ~/ros_ws"
-
-buildws(){
-    TMP_DIR=\$(pwd)
-    cdws
-    sros2
-    colcon build --symlink-install && sws
-    cd $TMP_DIR
-}
-EOF
-
-echo "alias sros1=\"source /opt/ros/noetic/setup.bash\"" >> /root/.bashrc
-echo "alias sros2=\"source /opt/ros/foxy/setup.bash\"" >> /root/.bashrc
-echo "alias sws=\"source /ros_ws/install/setup.bash\"" >> /root/.bashrc
-echo "sros2" >> /root/.bashrc
-echo "test -f /ros_ws/install/setup.bash && sws" >> /root/.bashrc
+echo "source ~/rob530_setup.bash" >> ~/.bashrc
