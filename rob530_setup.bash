@@ -4,13 +4,16 @@ alias sros1="source /opt/ros/noetic/setup.bash"
 alias sros2="source /opt/ros/foxy/setup.bash"
 alias sws="source ~/ros_ws/install/setup.bash"
 alias cdws="cd ~/ros_ws"
-alias mntshared="sudo mount -t fuse.vmhgfs-fuse .host:/ /mnt/hgfs -o allow_other"
+
+DATA_DIR=~/ros_ws/src/swarm-slam/data/ros2_data 
+DATA_INSTALL_DIR=~/ros_ws/install/cslam_experiments/share/cslam_experiments/data
+alias sdata="ln -s $DATA_DIR $DATA_INSTALL_DIR"
 
 buildws(){
     TMP_DIR=$(pwd)
     cdws
     sros2
-    colcon build --symlink-install && sws
+    colcon build --symlink-install && sws && sdata
     cd $TMP_DIR
 }
 

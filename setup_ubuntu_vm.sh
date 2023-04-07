@@ -1,6 +1,10 @@
 #!/bin/bash
 
+TMP_DIR=$(pwd)
+
+# VMware Tools Shared Folders Linux mounts
 sudo apt install open-vm-tools open-vm-tools-desktop
+sudo sh -c "echo \"vmhgfs-fuse    /mnt/hgfs    fuse    defaults,allow_other    0    0\" >> /etc/fstab"
 
 # Install ROS 2 Foxy
 sudo apt update
@@ -47,17 +51,29 @@ pip3 install -r requirements.txt
 pip3 install --upgrade numba
 
 # Install TEASER++
+cd ~/Documents
 git clone https://github.com/MIT-SPARK/TEASER-plusplus.git
 cd TEASER-plusplus
 mkdir build
 cd build
 cmake ..
 make
-make install
-ldconfig
+sudo make install
+sudo ldconfig
 cmake -DTEASERPP_PYTHON_VERSION=3.8 ..
 make teaserpp_python
 cd python
 pip3 install .
 
+# SSC
+cd ~/Documents
+sudo apt install libpcl-dev libyaml-cpp-dev
+git clone https://github.com/lilin-hitcrt/SSC.git
+mkdir build
+cd build
+cmake ..
+make
+
 echo "source ~/rob530_setup.bash" >> ~/.bashrc
+
+cd $TMP_DIR
