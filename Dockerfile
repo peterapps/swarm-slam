@@ -1,6 +1,6 @@
 FROM ros:foxy
 
-LABEL Name=swarmslam Version=0.0.1
+LABEL Name=swarmslam_test2 Version=0.0.1
 
 # Arguments
 ARG DEBIAN_FRONTEND=noninteractive
@@ -18,7 +18,11 @@ RUN apt update && \
     software-properties-common \
     ros-foxy-rtabmap-ros \
     ros-foxy-pcl-ros \
-    ros-foxy-perception-pcl
+    ros-foxy-perception-pcl \
+    ros-foxy-rviz2
+
+    # apt-get install -y libgl1-mesa-dev freeglut3-dev mesa-common-dev
+    # apt-get install -y mesa-utils libgl1-mesa-glx
 
 # Install gtsam
 RUN add-apt-repository -y ppa:borglab/gtsam-release-4.1 && \
@@ -62,6 +66,10 @@ RUN chown -R ${USER_NAME}:${USER_NAME} /ros_ws
 USER ${USER_NAME}
 RUN echo "source /ros_entrypoint.sh" >> /home/${USER_NAME}/.bashrc
 RUN echo "test -f /ros_ws/install/setup.bash && source /ros_ws/install/setup.bash" >> /home/${USER_NAME}/.bashrc
+
+# Add display handling stuff
+RUN echo 'export LIBGL_ALWAYS_INDIRECT=1' >> home/${USER_NAME}/.bashrc
+RUN echo 'export MESA_GL_VERSION_OVERRIDE=3.3' >> home/${USER_NAME}/.bashrc
 
 # Use bash instead of sh as a shell
 RUN echo "dash dash/sh boolean false" | sudo debconf-set-selections
