@@ -41,7 +41,7 @@ class SGPRMatching(object):
         args = sgpr_args()
         args.load(os.path.join(SG_PR_DIR, "config", "config.yml"))
         tab_printer(args)
-        self.model = SGModel(args, False)
+        self.model = SGTrainer(args, False)
         self.trainer.model.eval()
 
 
@@ -57,8 +57,8 @@ class SGPRMatching(object):
         
         self.graphs = self.graphs.cat(descriptor_torch)
 
+        self.items[self.nb_items] = item
         self.nb_items += 1
-
 
         # sc = descriptor.reshape(self.shape)
 
@@ -88,29 +88,38 @@ class SGPRMatching(object):
         """
         if self.nb_items < 1:
             return [None], [None]
-        
 
         query_torch = torch.FloatTensor(query)
 
-        nn_score = 0.0 # intitialize with the smalllest score
-        nn_idx = None
-        for idx, graph in enumerate(self.graphs):
+        graph_shape = self.graphs.shape[0]
+        scores, att_weights_1, att_weights_2 = self.trainer.eval_feature_batch(self.graphs, query_torch.repeat(graph_shape))
+        
+        scores_topk, idx_topk = torch.topk(scores, k)
+
+        scores_topk_numpy = scores_topk.cpu().detach().numpy()
+        idx_topk_numpy = idx_topk.cpu().detach().numpy()
+        
+        return [self.items[n] for n in idx_topk_numpy], scores_topk_numpy
+
+        # nn_score = 0.0 # intitialize with the smalllest score
+        # nn_idx = None
+        # for idx, graph in enumerate(self.graphs):
             
-            score, att_weights_1, att_weights_2 = self.trainer.eval_feature_pair(graph, query_torch)
+        #     score, att_weights_1, att_weights_2 = self.trainer.eval_feature_pair(graph, query_torch)
 
-            if (score > nn_score):
-                nn_score = score
-                nn_idx = idx
+        #     if (score > nn_score):
+        #         nn_score = score
+        #         nn_idx = idx
 
-        if nn_idx is None:
-            nn_idx = 0 
-            nn_yawdiff_deg = 0
-            similarity = 0.0
-        else:
-            # nn_yawdiff_deg = nn_yawdiff * (360/self.shape[1])
-            # similarity = 1 - nn_dist # For now we return only 1 match, but we could return the n best matches
-            similarity = nn_score
-        return [self.items[nn_idx]], [similarity]
+        # if nn_idx is None:
+        #     nn_idx = 0 
+        #     nn_yawdiff_deg = 0
+        #     similarity = 0.0
+        # else:
+        #     # nn_yawdiff_deg = nn_yawdiff * (360/self.shape[1])
+        #     # similarity = 1 - nn_dist # For now we return only 1 match, but we could return the n best matches
+        #     similarity = nn_score
+        # return [self.items[nn_idx]], [similarity]
 
 
         # # step 1

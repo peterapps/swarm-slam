@@ -380,44 +380,44 @@ class SGTrainer(object):
         gt_batch = data["target"].cpu().detach().numpy().reshape(-1)
         return loss, pred_batch, gt_batch
 
-    def fit(self):
-        """
-        Fitting a model.
-        """
-        print("\nModel training.\n")
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.args.learning_rate,
-                                          weight_decay=self.args.weight_decay)
-        f1_max_his = 0
-        self.model.train()
-        epochs = trange(self.args.epochs, leave=True, desc="Epoch")
-        for epoch in epochs:
-            batches = self.create_batches()
-            self.model.train()  
-            self.loss_sum = 0
-            main_index = 0
-            for index, batch in tqdm(enumerate(batches), total=len(batches), desc="Batches"):
-                a = time.time()
-                loss_score,_,_ = self.process_batch(batch)
-                main_index = main_index + len(batch)
-                self.loss_sum = self.loss_sum + loss_score * len(batch)
-                loss = self.loss_sum / main_index
-                epochs.set_description("Epoch (Loss=%g)" % round(loss, 5))
-                self.writer.add_scalar('Train_sum', loss, int(epoch)*len(batches)*int(self.args.batch_size) + main_index)
-                self.writer.add_scalar('Train loss', loss_score, int(epoch) * len(batches)*int(self.args.batch_size) + main_index)
+    # def fit(self):
+    #     """
+    #     Fitting a model.
+    #     """
+    #     print("\nModel training.\n")
+    #     self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.args.learning_rate,
+    #                                       weight_decay=self.args.weight_decay)
+    #     f1_max_his = 0
+    #     self.model.train()
+    #     epochs = trange(self.args.epochs, leave=True, desc="Epoch")
+    #     for epoch in epochs:
+    #         batches = self.create_batches()
+    #         self.model.train()  
+    #         self.loss_sum = 0
+    #         main_index = 0
+    #         for index, batch in tqdm(enumerate(batches), total=len(batches), desc="Batches"):
+    #             a = time.time()
+    #             loss_score,_,_ = self.process_batch(batch)
+    #             main_index = main_index + len(batch)
+    #             self.loss_sum = self.loss_sum + loss_score * len(batch)
+    #             loss = self.loss_sum / main_index
+    #             epochs.set_description("Epoch (Loss=%g)" % round(loss, 5))
+    #             self.writer.add_scalar('Train_sum', loss, int(epoch)*len(batches)*int(self.args.batch_size) + main_index)
+    #             self.writer.add_scalar('Train loss', loss_score, int(epoch) * len(batches)*int(self.args.batch_size) + main_index)
 
-            if epoch % 2 == 0:
-                print("\nModel saving.\n")
-                loss, f1_max = self.score("eval")
-                self.writer.add_scalar("eval_loss", loss, int(epoch)*len(batches)*int(self.args.batch_size))
-                self.writer.add_scalar("f1_max_score", f1_max, int(epoch) * len(batches) * int(self.args.batch_size))
-                dict_name = self.args.logdir + "/" + str(epoch)+'.pth'
-                torch.save(self.model.state_dict(), dict_name)
-                if f1_max_his <= f1_max:
-                    f1_max_his = f1_max
-                    dict_name = self.args.logdir + "/" + str(epoch)+"_best" + '.pth'
-                    torch.save(self.model.state_dict(), dict_name)
-                    print("\n best model saved ", dict_name)
-                print("------------------------------")
+    #         if epoch % 2 == 0:
+    #             print("\nModel saving.\n")
+    #             loss, f1_max = self.score("eval")
+    #             self.writer.add_scalar("eval_loss", loss, int(epoch)*len(batches)*int(self.args.batch_size))
+    #             self.writer.add_scalar("f1_max_score", f1_max, int(epoch) * len(batches) * int(self.args.batch_size))
+    #             dict_name = self.args.logdir + "/" + str(epoch)+'.pth'
+    #             torch.save(self.model.state_dict(), dict_name)
+    #             if f1_max_his <= f1_max:
+    #                 f1_max_his = f1_max
+    #                 dict_name = self.args.logdir + "/" + str(epoch)+"_best" + '.pth'
+    #                 torch.save(self.model.state_dict(), dict_name)
+    #                 print("\n best model saved ", dict_name)
+    #             print("------------------------------")
 
     def score(self, split = 'test'):
         """
@@ -457,15 +457,15 @@ class SGTrainer(object):
         print("\nModel " + split + " loss: " + str(model_loss) + ".")
         return model_loss, F1_max_score
 
-    def print_evaluation(self):
-        """
-        Printing the error rates.
-        """
-        norm_ged_mean = np.mean(self.ground_truth)
-        base_error = np.mean([(n - norm_ged_mean) ** 2 for n in self.ground_truth])
-        model_error = np.mean(self.scores)
-        print("\nBaseline error: " + str(round(base_error, 5)) + ".")
-        print("\nModel test error: " + str(round(model_error, 5)) + ".")
+    # def print_evaluation(self):
+    #     """
+    #     Printing the error rates.
+    #     """
+    #     norm_ged_mean = np.mean(self.ground_truth)
+    #     base_error = np.mean([(n - norm_ged_mean) ** 2 for n in self.ground_truth])
+    #     model_error = np.mean(self.scores)
+    #     print("\nBaseline error: " + str(round(base_error, 5)) + ".")
+    #     print("\nModel test error: " + str(round(model_error, 5)) + ".")
 
     def eval_pair(self, pair_file):
         # self.model.eval()
@@ -505,7 +505,7 @@ class SGTrainer(object):
         :param features_2: Torch tensor (1, _, _) with graph features for second in pair
         :return data: Dictionary with data.
         """
-        print(features_1.shape, features_2.shape)
+        # print(features_1.shape, features_2.shape)
         # self.model.eval()
 
         # data = process_pair(pair_file)
@@ -602,42 +602,55 @@ class SGTrainer(object):
         prediction = prediction.cpu().detach().numpy().reshape(-1)
         gt = np.array(batch_target).reshape(-1)
         return prediction, gt
+    
+    def eval_feature_batch(self, batch_features_1: torch.tensor, batch_features_2: torch.tensor):
+        self.model.eval()
+        
+        data = dict()
+        data["features_1"] = batch_features_1
+        data["features_2"] = batch_features_2
+
+        prediction, _, _ = self.model(data)
+
+        prediction = prediction.cpu().detach().numpy().reshape(-1)
+        return prediction
+    
 
 
-    def write_soft_label(self, data_dir):
-        eval_graphs = []
-        listDir(data_dir, eval_graphs)
-        TP = 0
-        TN = 0
-        FP = 0
-        FN = 0
-        thresh = 0.5
-        for i in range(len(eval_graphs)):
-            pair_file = eval_graphs[i]
-            data = json.load(open(pair_file))
-            pred, _, _ = self.eval_pair(data)
+    # def write_soft_label(self, data_dir):
+    #     eval_graphs = []
+    #     listDir(data_dir, eval_graphs)
+    #     TP = 0
+    #     TN = 0
+    #     FP = 0
+    #     FN = 0
+    #     thresh = 0.5
+    #     for i in range(len(eval_graphs)):
+    #         pair_file = eval_graphs[i]
+    #         data = json.load(open(pair_file))
+    #         pred, _, _ = self.eval_pair(data)
 
-            if pred <= thresh:
-                if data["distance"] <=10:
-                    TN += 1
-                else:
-                    FN += 1
-                data["distance"] = 100
-            else:
-                if data["distance"] <=10:
-                    TP += 1
-                else:
-                    FP += 1
-                data["distance"] = 0
+    #         if pred <= thresh:
+    #             if data["distance"] <=10:
+    #                 TN += 1
+    #             else:
+    #                 FN += 1
+    #             data["distance"] = 100
+    #         else:
+    #             if data["distance"] <=10:
+    #                 TP += 1
+    #             else:
+    #                 FP += 1
+    #             data["distance"] = 0
 
-            file_name = os.path.join("/media/work/data/kitti/odometry/semantic-kitti/DGCNN_graph_pairs_3_20/pred_label/05",
-                                     pair_file.split('/')[-1])
-            print("write pred label: ", file_name)
-            with open(file_name, "w", encoding="utf-8") as file:
-                json.dump(data, file)
+    #         file_name = os.path.join("/media/work/data/kitti/odometry/semantic-kitti/DGCNN_graph_pairs_3_20/pred_label/05",
+    #                                  pair_file.split('/')[-1])
+    #         print("write pred label: ", file_name)
+    #         with open(file_name, "w", encoding="utf-8") as file:
+    #             json.dump(data, file)
 
-        precesion = TP / (TP + FP)
-        recall = TP / (TP + FN)
-        print("thresh: ", thresh)
-        print("precision: ", precesion)
-        print("recall:", recall)
+    #     precesion = TP / (TP + FP)
+    #     recall = TP / (TP + FN)
+    #     print("thresh: ", thresh)
+    #     print("precision: ", precesion)
+    #     print("recall:", recall)
