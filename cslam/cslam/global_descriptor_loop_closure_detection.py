@@ -53,6 +53,14 @@ class GlobalDescriptorLoopClosureDetection(object):
             self.node.get_logger().info('Using ScanContext.')
             self.global_descriptor = ScanContext(self.params, self.node)
             self.keyframe_type = "pointcloud"
+        elif self.params['frontend.global_descriptor_technique'].lower(
+        ) == 'sg_pr':
+            from cslam.lidar_pr.sg_pr import SGPR
+            # global icp_utils
+            # import cslam.lidar_pr.icp_utils as icp_utils
+            self.node.get_logger().info('Using SG-PR.')
+            self.global_descriptor = SGPR()
+            self.keyframe_type = "semantic-pointcloud"
         else:
             from cslam.vpr.cosplace import CosPlace
             self.node.get_logger().info('Using CosPlace. (default)')
@@ -86,6 +94,11 @@ class GlobalDescriptorLoopClosureDetection(object):
             self.receive_keyframe_subscriber = self.node.create_subscription(
                 KeyframeRGB, 'cslam/keyframe_data', self.receive_keyframe, 100)
         elif self.keyframe_type == "pointcloud":
+            self.receive_keyframe_subscriber = self.node.create_subscription(
+                KeyframePointCloud, 'cslam/keyframe_data', self.receive_keyframe,
+                100)
+        elif self.keyframe_type == "semantic-pointcloud":
+            # TODO: What kind of message Peter?
             self.receive_keyframe_subscriber = self.node.create_subscription(
                 KeyframePointCloud, 'cslam/keyframe_data', self.receive_keyframe,
                 100)
@@ -398,6 +411,11 @@ class GlobalDescriptorLoopClosureDetection(object):
         elif self.keyframe_type == "pointcloud":
             embedding = self.global_descriptor.compute_embedding(
                 icp_utils.ros_pointcloud_to_points(msg.pointcloud))
+        elif self.keyframe_type == "semantic-pointcloud":
+            # TODO: break message into point cloud and semantic lables
+            # This will be using SG_PR
+            embedding = self.global_descriptor.compute_embedding(msg)
+                # icp_utils.ros_pointcloud_to_points(msg.pointcloud))
 
         self.add_global_descriptor_to_map(embedding, msg.id)
 

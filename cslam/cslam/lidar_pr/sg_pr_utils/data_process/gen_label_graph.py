@@ -1,26 +1,26 @@
 #!/usr/bin/env python3
 # This file is covered by the LICENSE file in the root of this project.
 
-import argparse
-import os
+# import argparse
+# import os
 # import threading
-import yaml
+# import yaml
 import numpy as np
 import pcl
 # import matplotlib.pyplot as plt
 # from mpl_toolkits.mplot3d import Axes3D
-from auxiliary.laserscan import SemLaserScan
-import random
-import open3d
+# from auxiliary.laserscan import SemLaserScan
+# import random
+# import open3d
 # from open3d import *
-import json
-import collections
-from tqdm import tqdm
-import time
-import rclpy
-from std_msgs.msg import Header
-from sensor_msgs.msg import PointCloud2, PointField
-import sensor_msgs_py.point_cloud2 as pc2
+# import json
+# import collections
+# from tqdm import tqdm
+# import time
+# import rclpy
+# from std_msgs.msg import Header
+# from sensor_msgs.msg import PointCloud2, PointField
+# import sensor_msgs_py.point_cloud2 as pc2
 
 learning_map={0 : 0,     # "unlabeled"
     1 : 0,     # "outlier" mapped to "unlabeled" --------------------------mapped       x
@@ -103,118 +103,118 @@ node_map={
 #         open3d.draw_geometries([point_cloud], window_name='semantic label:' + str(111),
 #                            width=1920, height=1080, left=50, top=50)
 
-def _make_point_field(num_field):
-    msg_pf1 = pc2.PointField()
-    msg_pf1.name = np.str('x')
-    msg_pf1.offset = np.uint32(0)
-    msg_pf1.datatype = np.uint8(7)
-    msg_pf1.count = np.uint32(1)
+# def _make_point_field(num_field):
+#     msg_pf1 = pc2.PointField()
+#     msg_pf1.name = np.str('x')
+#     msg_pf1.offset = np.uint32(0)
+#     msg_pf1.datatype = np.uint8(7)
+#     msg_pf1.count = np.uint32(1)
 
-    msg_pf2 = pc2.PointField()
-    msg_pf2.name = np.str('y')
-    msg_pf2.offset = np.uint32(4)
-    msg_pf2.datatype = np.uint8(7)
-    msg_pf2.count = np.uint32(1)
+#     msg_pf2 = pc2.PointField()
+#     msg_pf2.name = np.str('y')
+#     msg_pf2.offset = np.uint32(4)
+#     msg_pf2.datatype = np.uint8(7)
+#     msg_pf2.count = np.uint32(1)
 
-    msg_pf3 = pc2.PointField()
-    msg_pf3.name = np.str('z')
-    msg_pf3.offset = np.uint32(8)
-    msg_pf3.datatype = np.uint8(7)
-    msg_pf3.count = np.uint32(1)
+#     msg_pf3 = pc2.PointField()
+#     msg_pf3.name = np.str('z')
+#     msg_pf3.offset = np.uint32(8)
+#     msg_pf3.datatype = np.uint8(7)
+#     msg_pf3.count = np.uint32(1)
 
-    if num_field == 4:
-        msg_pf4 = pc2.PointField()
-        msg_pf4.name = np.str('node')
-        msg_pf4.offset = np.uint32(16)
-        msg_pf4.datatype = np.uint8(7)
-        msg_pf4.count = np.uint32(1)
-        return [msg_pf1, msg_pf2, msg_pf3, msg_pf4]
+#     if num_field == 4:
+#         msg_pf4 = pc2.PointField()
+#         msg_pf4.name = np.str('node')
+#         msg_pf4.offset = np.uint32(16)
+#         msg_pf4.datatype = np.uint8(7)
+#         msg_pf4.count = np.uint32(1)
+#         return [msg_pf1, msg_pf2, msg_pf3, msg_pf4]
 
-    elif num_field ==6:
-        msg_pf4 = pc2.PointField()
-        msg_pf4.name = np.str('intensity')
-        msg_pf4.offset = np.uint32(16)
-        msg_pf4.datatype = np.uint8(7)  #float64
-        msg_pf4.count = np.uint32(1)
+#     elif num_field ==6:
+#         msg_pf4 = pc2.PointField()
+#         msg_pf4.name = np.str('intensity')
+#         msg_pf4.offset = np.uint32(16)
+#         msg_pf4.datatype = np.uint8(7)  #float64
+#         msg_pf4.count = np.uint32(1)
 
-        msg_pf5 = pc2.PointField()
-        msg_pf5.name = np.str('sem_label')
-        msg_pf5.offset = np.uint32(20)
-        msg_pf5.datatype = np.uint8(7)  # 4 int16
-        msg_pf5.count = np.uint32(1)
+#         msg_pf5 = pc2.PointField()
+#         msg_pf5.name = np.str('sem_label')
+#         msg_pf5.offset = np.uint32(20)
+#         msg_pf5.datatype = np.uint8(7)  # 4 int16
+#         msg_pf5.count = np.uint32(1)
 
-        msg_pf6 = pc2.PointField()
-        msg_pf6.name = np.str('inst_label')
-        msg_pf6.offset = np.uint32(24)
-        msg_pf6.datatype = np.uint8(7)  # 4 int16
-        msg_pf6.count = np.uint32(1)
+#         msg_pf6 = pc2.PointField()
+#         msg_pf6.name = np.str('inst_label')
+#         msg_pf6.offset = np.uint32(24)
+#         msg_pf6.datatype = np.uint8(7)  # 4 int16
+#         msg_pf6.count = np.uint32(1)
 
-        return [msg_pf1, msg_pf2, msg_pf3, msg_pf4, msg_pf5, msg_pf6]
-    # if num_field == 4:
-    #     fields = [PointField('x', 0, PointField.FLOAT32, 1),
-    #       PointField('y', 4, PointField.FLOAT32, 1),
-    #       PointField('z', 8, PointField.FLOAT32, 1),
-    #       PointField('node', 16, PointField.UINT32, 1),
-    #       ]
-    #     return fields
-    # elif num_field == 6:
-    #     fields = [PointField('x', 0, PointField.FLOAT32, 1),
-    #       PointField('y', 4, PointField.FLOAT32, 1),
-    #       PointField('z', 8, PointField.FLOAT32, 1),
-    #       PointField('intensity', 12, PointField.FLOAT32, 1),
-    #       PointField('sem_label', 16, PointField.UINT32, 1),
-    #       PointField('inst_label', 20, PointField.UINT32, 1),
-    #       ]
+#         return [msg_pf1, msg_pf2, msg_pf3, msg_pf4, msg_pf5, msg_pf6]
+#     # if num_field == 4:
+#     #     fields = [PointField('x', 0, PointField.FLOAT32, 1),
+#     #       PointField('y', 4, PointField.FLOAT32, 1),
+#     #       PointField('z', 8, PointField.FLOAT32, 1),
+#     #       PointField('node', 16, PointField.UINT32, 1),
+#     #       ]
+#     #     return fields
+#     # elif num_field == 6:
+#     #     fields = [PointField('x', 0, PointField.FLOAT32, 1),
+#     #       PointField('y', 4, PointField.FLOAT32, 1),
+#     #       PointField('z', 8, PointField.FLOAT32, 1),
+#     #       PointField('intensity', 12, PointField.FLOAT32, 1),
+#     #       PointField('sem_label', 16, PointField.UINT32, 1),
+#     #       PointField('inst_label', 20, PointField.UINT32, 1),
+#     #       ]
 
-    #     return fields
-    else:
-        raise ValueError("wrong num_field.")
+#     #     return fields
+#     else:
+#         raise ValueError("wrong num_field.")
 
 
-class Semantic_kitti_node(object):
-    def __init__(self,  pub_rate=10, label_topic='', graph_topic=''):
+class SemanticGraphGenerator(object):
+    def __init__(self): # , pub_rate=10, label_topic='', graph_topic=''):
         """
         ros node spin in init function
         :param pub_rate:
         :param pub_topic:
         """
-        self._pub_rate = pub_rate
+        # self._pub_rate = pub_rate
 
-        rclpy.init(args=None)
-        self.node = rclpy.create_node('node')
+        # rclpy.init(args=None)
+        # self.node = rclpy.create_node('node')
 
-        # publisher
-        # self._labels_pub = rospy.Publisher(label_topic, PointCloud2, queue_size=10)
-        self._labels_pub = self.node.create_publisher(PointCloud2, label_topic, qos_profile=10)
+        # # publisher
+        # # self._labels_pub = rospy.Publisher(label_topic, PointCloud2, queue_size=10)
+        # self._labels_pub = self.node.create_publisher(PointCloud2, label_topic, qos_profile=10)
 
-        # self._graph_pub = rospy.Publisher(graph_topic, PointCloud2, queue_size = 10)
-        self._graph_pub = self.node.create_publisher(PointCloud2, graph_topic, qos_profile=10)
+        # # self._graph_pub = rospy.Publisher(graph_topic, PointCloud2, queue_size = 10)
+        # self._graph_pub = self.node.create_publisher(PointCloud2, graph_topic, qos_profile=10)
 
-        # ros node init
-        # rospy.init_node('node', anonymous=True)
-        # rospy.loginfo("node started.")
+        # # ros node init
+        # # rospy.init_node('node', anonymous=True)
+        # # rospy.loginfo("node started.")
 
-        self.node.get_logger().info('Created node')
+        # self.node.get_logger().info('Created node')
 
-        self.header1 = Header()
-        self.header1.stamp = self.node.get_clock().now().to_msg()
-        self.header1.frame_id = "velodyne"
+        # self.header1 = Header()
+        # self.header1.stamp = self.node.get_clock().now().to_msg()
+        # self.header1.frame_id = "velodyne"
 
-        self.header2 = Header()
-        self.header2.stamp = self.node.get_clock().now().to_msg()
-        self.header2.frame_id = "velodyne"
+        # self.header2 = Header()
+        # self.header2.stamp = self.node.get_clock().now().to_msg()
+        # self.header2.frame_id = "velodyne"
     
-    def gen_labels(self, FLAGS, scan_name, label_name, label_output_dir):
+    def gen_labels(self, scan: np.ndarray, label: np.ndarray): # FLAGS, scan_name, label_name, label_output_dir):
         # start = time.time()
         # open scan
         # TODO(yxm): downsampling
-        scan = np.fromfile(scan_name, dtype=np.float32)
+        # scan = np.fromfile(scan_name, dtype=np.float32)
         scan = scan.reshape((-1, 4))
         # put in attribute
         points = scan[:, 0:4]  # get xyzr
         remissions = scan[:, 3]  # get remission
 
-        label = np.fromfile(label_name, dtype=np.uint32)
+        # label = np.fromfile(label_name, dtype=np.uint32)
         label = label.reshape((-1))
 
         # demolition or not
@@ -253,7 +253,7 @@ class Semantic_kitti_node(object):
         cluster = []
         inst_id = 0
         for id_i, label_i in enumerate(sem_label_set):
-            print('sem_label:', label_i)
+            # print('sem_label:', label_i)
             index = np.argwhere(sem_label == label_i)
             index = index.reshape(index.shape[0])
             sem_cluster = points[index, :]
@@ -280,7 +280,7 @@ class Semantic_kitti_node(object):
                 for id_j, label_j in enumerate(tmp_inst_set):
                     points_index = np.argwhere(tmp_inst_label == label_j)
                     points_index = points_index.reshape(points_index.shape[0])
-                    print(id_j, 'inst_size:', len(points_index))
+                    # print(id_j, 'inst_size:', len(points_index))
                     if len(points_index) <= 20:
                         continue
                     inst_cluster = sem_cluster[points_index, :]
@@ -319,7 +319,7 @@ class Semantic_kitti_node(object):
                 # time_end = time.time()
                 # print(time_end - time_start)
                 for j, indices in enumerate(cluster_indices):
-                    print('j = ', j, ', indices = ' + str(len(indices)))
+                    # print('j = ', j, ', indices = ' + str(len(indices)))
                     inst_cluster = np.zeros((len(indices), 4), dtype=np.float32)
                     inst_cluster = sem_cluster[np.array(indices), 0:4]
                     inst_cluster = np.concatenate((inst_cluster, np.full((inst_cluster.shape[0],1), label_i, dtype=np.uint32)), axis=1)
@@ -331,20 +331,20 @@ class Semantic_kitti_node(object):
         # print(time.time()-start)
         # print('*'*80)
         cluster = np.array(cluster)
-        if 'path' in FLAGS.pub_or_path:
-            np.save(label_output_dir+'/'+label_name.split('/')[-1].split('.')[0]+".npy", cluster)
-        if 'pub' in FLAGS.pub_or_path:
-            # print(cluster[11100:11110])
-            msg_points = pc2.create_cloud(header=self.header1, fields=_make_point_field(cluster.shape[1]), points=cluster)
-            self._labels_pub.publish(msg_points)
+        # if 'path' in FLAGS.pub_or_path:
+        #     np.save(label_output_dir+'/'+label_name.split('/')[-1].split('.')[0]+".npy", cluster)
+        # if 'pub' in FLAGS.pub_or_path:
+        #     # print(cluster[11100:11110])
+        #     msg_points = pc2.create_cloud(header=self.header1, fields=_make_point_field(cluster.shape[1]), points=cluster)
+        #     self._labels_pub.publish(msg_points)
 
         return cluster      
 
-    def gen_graphs(self, FLAGS, scan_name, scan, graph_output_dir):
+    def gen_graphs(self, scan): # FLAGS, scan_name, scan, graph_output_dir):
         inst = scan[:, -1] # get instance label
         inst_label_set = list(set(inst))  # get nums of inst
         inst_label_set.sort()
-        print("inst set: ", inst_label_set)
+        # print("inst set: ", inst_label_set)
         nodes = []  # graph node
         edges = []  # graph edge
         weights = []  # graph edge weights
@@ -371,7 +371,7 @@ class Semantic_kitti_node(object):
         dist_thresh = 5 # less than thresh, add an edge between nodes
 
         for i in range(len(cluster)-1):
-            print("gen_graphs i: ", i) 
+            # print("gen_graphs i: ", i) 
             for j in range(i+1, len(cluster)):
                 pc_i = cluster[i]
                 pc_j = cluster[j]
@@ -390,127 +390,129 @@ class Semantic_kitti_node(object):
                 else:
                     pass
 
-        print("done looping: ", len(cluster))
+        # print("done looping: ", len(cluster))
 
         # generate graph
         graph = {"nodes": nodes,
-                "edges": edges,
-                "weights": weights,
-                "centers": centers
+                 "edges": edges,
+                 "weights": weights,
+                 "centers": centers
                 }
 
         # print(graph)
-        if 'path' in FLAGS.pub_or_path:
-            file_name = os.path.join(graph_output_dir, scan_name.split('/')[-1].split('.')[0]+".json")
-            # print("output json: ", file_name)
-            with open(file_name, "w", encoding="utf-8") as file: json.dump(graph, file)
-            print('wrote file')
-        if 'pub' in FLAGS.pub_or_path:
-            centers = np.array(centers)
-            nodes = np.array(nodes)
-            pub_nodes = np.concatenate((centers, nodes.reshape(-1, 1).astype(np.uint32)), axis=1)
-            msg_points = pc2.create_cloud(header=self.header2, fields=_make_point_field(pub_nodes.shape[1]), points=pub_nodes)
-            self._graph_pub.publish(msg_points)
+        # if 'path' in FLAGS.pub_or_path:
+        #     file_name = os.path.join(graph_output_dir, scan_name.split('/')[-1].split('.')[0]+".json")
+        #     # print("output json: ", file_name)
+        #     with open(file_name, "w", encoding="utf-8") as file: json.dump(graph, file)
+        #     print('wrote file')
+        # if 'pub' in FLAGS.pub_or_path:
+        #     centers = np.array(centers)
+        #     nodes = np.array(nodes)
+        #     pub_nodes = np.concatenate((centers, nodes.reshape(-1, 1).astype(np.uint32)), axis=1)
+        #     msg_points = pc2.create_cloud(header=self.header2, fields=_make_point_field(pub_nodes.shape[1]), points=pub_nodes)
+        #     self._graph_pub.publish(msg_points)
             # rospy.loginfo(scan_names[frame])
 
+        return graph
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser("./gen_graph.py")
-    parser.add_argument('--dataset', '-d', type=str, required=False, default="/ros_ws/kitti_dataset_mini/", help='Dataset to calculate content. No Default')
-    parser.add_argument('--config', '-c', type=str, required=False, default="config/semantic-kitti.yaml", help='Dataset config file. Defaults to %(default)s')
-    parser.add_argument('--output_label', type=str, required=False, default="/ros_ws/Semantic_KITTI/SG_PR/labels", help='Output path for labels')
-    parser.add_argument('--output_graph', type=str, required=False, default="/ros_ws/Semantic_KITTI/SG_PR/graphs", help='Output path for graphs')
-    parser.add_argument('--pub_or_path', type=str, required=False, default="path", help='pub_or_path')
-    parser.add_argument('--pub_rate', type=int, default=10, help='the frequency(hz) of pc published, default `10`')
-    parser.add_argument('--label_topic', type=str, default='/labeled_pc', help='the 3D point cloud message topic to be published, default `/labeled_pc`')
-    parser.add_argument('--graph_topic', type=str, default='/graphs', help='the semantic graph message topic to be published, default `/graphs`')
-    parser.add_argument('--demolition', type=bool, default=False, help='demolition or not')
 
-    FLAGS, unparsed = parser.parse_known_args()
+# if __name__ == '__main__':
+#     parser = argparse.ArgumentParser("./gen_graph.py")
+#     parser.add_argument('--dataset', '-d', type=str, required=False, default="/ros_ws/kitti_dataset_mini/", help='Dataset to calculate content. No Default')
+#     parser.add_argument('--config', '-c', type=str, required=False, default="config/semantic-kitti.yaml", help='Dataset config file. Defaults to %(default)s')
+#     parser.add_argument('--output_label', type=str, required=False, default="/ros_ws/Semantic_KITTI/SG_PR/labels", help='Output path for labels')
+#     parser.add_argument('--output_graph', type=str, required=False, default="/ros_ws/Semantic_KITTI/SG_PR/graphs", help='Output path for graphs')
+#     parser.add_argument('--pub_or_path', type=str, required=False, default="path", help='pub_or_path')
+#     parser.add_argument('--pub_rate', type=int, default=10, help='the frequency(hz) of pc published, default `10`')
+#     parser.add_argument('--label_topic', type=str, default='/labeled_pc', help='the 3D point cloud message topic to be published, default `/labeled_pc`')
+#     parser.add_argument('--graph_topic', type=str, default='/graphs', help='the semantic graph message topic to be published, default `/graphs`')
+#     parser.add_argument('--demolition', type=bool, default=False, help='demolition or not')
 
-    # print summary of what we will do
-    print("*" * 80)
-    print("INTERFACE:")
-    print("Dataset", FLAGS.dataset)
-    print("Config", FLAGS.config)
-    print("*" * 80)
+#     FLAGS, unparsed = parser.parse_known_args()
 
-    # open config file
-    try:
-        print("Opening config file %s" % FLAGS.config)
-        CFG = yaml.safe_load(open(FLAGS.config, 'r'))
-    except Exception as e:
-        print(e)
-        print("Error opening yaml file.")
-        quit()
+#     # print summary of what we will do
+#     print("*" * 80)
+#     print("INTERFACE:")
+#     print("Dataset", FLAGS.dataset)
+#     print("Config", FLAGS.config)
+#     print("*" * 80)
 
-    # get training sequences to calculate statistics
-    sequences = CFG["split"]["train"][:]
-    color_map = CFG['color_map']
-    learning_map_inv = CFG['learning_map_inv']
-    print("Analizing sequences", sequences)
+#     # open config file
+#     try:
+#         print("Opening config file %s" % FLAGS.config)
+#         CFG = yaml.safe_load(open(FLAGS.config, 'r'))
+#     except Exception as e:
+#         print(e)
+#         print("Error opening yaml file.")
+#         quit()
 
-    # itearate over sequences
-    for seq in sequences[:]:
-        # make seq string
-        print("*" * 80)
-        seqstr = '{0:02d}'.format(int(seq))
-        print("parsing seq {}".format(seq))
+#     # get training sequences to calculate statistics
+#     sequences = CFG["split"]["train"][:]
+#     color_map = CFG['color_map']
+#     learning_map_inv = CFG['learning_map_inv']
+#     print("Analizing sequences", sequences)
 
-        # prepare output dir
-        label_output_dir = FLAGS.output_label + '/' + seqstr
-        if not os.path.exists(label_output_dir):
-            os.makedirs(label_output_dir)
+#     # itearate over sequences
+#     for seq in sequences[:]:
+#         # make seq string
+#         print("*" * 80)
+#         seqstr = '{0:02d}'.format(int(seq))
+#         print("parsing seq {}".format(seq))
 
-        graph_output_dir = FLAGS.output_graph + '/' + seqstr
-        if not os.path.exists(graph_output_dir):
-            os.makedirs(graph_output_dir)
+#         # prepare output dir
+#         label_output_dir = FLAGS.output_label + '/' + seqstr
+#         if not os.path.exists(label_output_dir):
+#             os.makedirs(label_output_dir)
+
+#         graph_output_dir = FLAGS.output_graph + '/' + seqstr
+#         if not os.path.exists(graph_output_dir):
+#             os.makedirs(graph_output_dir)
         
-        # does sequence folder exist?
-        scan_paths = os.path.join(FLAGS.dataset, "sequences", seqstr, "velodyne")
-        if os.path.isdir(scan_paths):
-            print("Sequence folder exists!")
-        else:
-            print("Sequence folder doesn't exist! Exiting...")
-            quit()
-        # populate the pointclouds
-        scan_names = [os.path.join(dp, f) for dp, dn, fn in os.walk(os.path.expanduser(scan_paths)) for f in fn]
-        scan_names.sort()
+#         # does sequence folder exist?
+#         scan_paths = os.path.join(FLAGS.dataset, "sequences", seqstr, "velodyne")
+#         if os.path.isdir(scan_paths):
+#             print("Sequence folder exists!")
+#         else:
+#             print("Sequence folder doesn't exist! Exiting...")
+#             quit()
+#         # populate the pointclouds
+#         scan_names = [os.path.join(dp, f) for dp, dn, fn in os.walk(os.path.expanduser(scan_paths)) for f in fn]
+#         scan_names.sort()
 
-        # does sequence folder exist?
-        label_paths = os.path.join(FLAGS.dataset, "sequences", seqstr, "labels")
-        if os.path.isdir(label_paths):
-            print("Labels folder exists!")
-        else:
-            print("Labels folder doesn't exist! Exiting...")
-            quit()
-        # populate the pointclouds
-        label_names = [os.path.join(dp, f) for dp, dn, fn in os.walk(os.path.expanduser(label_paths)) for f in fn]
-        label_names.sort()
+#         # does sequence folder exist?
+#         label_paths = os.path.join(FLAGS.dataset, "sequences", seqstr, "labels")
+#         if os.path.isdir(label_paths):
+#             print("Labels folder exists!")
+#         else:
+#             print("Labels folder doesn't exist! Exiting...")
+#             quit()
+#         # populate the pointclouds
+#         label_names = [os.path.join(dp, f) for dp, dn, fn in os.walk(os.path.expanduser(label_paths)) for f in fn]
+#         label_names.sort()
 
-        # check that there are same amount of labels and scans
-        # print(len(label_names))
-        # print(len(scan_names))
-        assert(len(label_names) == len(scan_names))
+#         # check that there are same amount of labels and scans
+#         # print(len(label_names))
+#         # print(len(scan_names))
+#         assert(len(label_names) == len(scan_names))
 
-        # create a scan
-        kitti_node = Semantic_kitti_node(FLAGS.pub_rate, FLAGS.label_topic, FLAGS.graph_topic)
-        rate = kitti_node.node.create_rate(FLAGS.pub_rate, kitti_node.node.get_clock()) # rospy.Rate(FLAGS.pub_rate)
+#         # create a scan
+#         kitti_node = Semantic_kitti_node(FLAGS.pub_rate, FLAGS.label_topic, FLAGS.graph_topic)
+#         rate = kitti_node.node.create_rate(FLAGS.pub_rate, kitti_node.node.get_clock()) # rospy.Rate(FLAGS.pub_rate)
 
-        # # Spin in a separate thread
-        # thread = threading.Thread(target=rclpy.spin, args=(node, ), daemon=True)
-        # thread.start()
+#         # # Spin in a separate thread
+#         # thread = threading.Thread(target=rclpy.spin, args=(node, ), daemon=True)
+#         # thread.start()
         
-        for frame in tqdm(range(len(scan_names))):
-            if not rclpy.ok():
-                break
+#         for frame in tqdm(range(len(scan_names))):
+#             if not rclpy.ok():
+#                 break
 
-            cluster = kitti_node.gen_labels(FLAGS, scan_names[frame], label_names[frame], label_output_dir)
-            kitti_node.gen_graphs(FLAGS, scan_names[frame], cluster, graph_output_dir)
-            print('start sleep')
-            rate.sleep()
-            print('end sleep')
-            # rospy.logwarn("%d frames published.", frame)
+#             cluster = kitti_node.gen_labels(FLAGS, scan_names[frame], label_names[frame], label_output_dir)
+#             kitti_node.gen_graphs(FLAGS, scan_names[frame], cluster, graph_output_dir)
+#             print('start sleep')
+#             rate.sleep()
+#             print('end sleep')
+#             # rospy.logwarn("%d frames published.", frame)
 
-    # rclpy.shutdown()
-    # thread.join()
+#     # rclpy.shutdown()
+#     # thread.join()

@@ -1,6 +1,7 @@
 import numpy as np
 from cslam.nns_matching import NearestNeighborsMatching
 from cslam.lidar_pr.scancontext_matching import ScanContextMatching
+from cslam.lidar_pr.sg_pr_matching import SGPRMatching
 from cslam.algebraic_connectivity_maximization import AlgebraicConnectivityMaximization, EdgeInterRobot
 
 class LoopClosureSparseMatching(object):
@@ -20,6 +21,8 @@ class LoopClosureSparseMatching(object):
         # Initialize matching structs
         if self.params["frontend.sensor_type"] == "lidar":
             self.local_nnsm = ScanContextMatching()
+        elif self.params["frontend.sensor_type"] == "semantic-lidar":
+            self.local_nnsm = SGPRMatching()
         else:
             self.local_nnsm = NearestNeighborsMatching()
         self.other_robots_nnsm = {}
@@ -27,6 +30,8 @@ class LoopClosureSparseMatching(object):
             if i != self.params['robot_id']:
                 if self.params["frontend.sensor_type"] == "lidar":
                     self.other_robots_nnsm[i] = ScanContextMatching()
+                elif self.params["frontend.sensor_type"] == "semantic-lidar":
+                    self.other_robots_nnsm[i] = SGPRMatching()
                 else:
                     self.other_robots_nnsm[i] = NearestNeighborsMatching()
         # Initialize candidate selection algorithm
