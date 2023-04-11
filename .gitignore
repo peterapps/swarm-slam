@@ -6,3 +6,6 @@ build/
 .trunk/
 *__pycache__/
 *__pycache__*
+
+.DS_Store
+data/

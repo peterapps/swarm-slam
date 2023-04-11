@@ -3,7 +3,6 @@ project(cslam_experiments)
 
 install(DIRECTORY 
    config
-   data
    launch
    DESTINATION share/${PROJECT_NAME}/
 )
