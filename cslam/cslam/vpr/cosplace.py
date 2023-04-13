@@ -31,10 +31,12 @@ class CosPlace(object):
     """
 
     def __init__(self, params, node):
-        """Initialization
+        """
+        Initialization
 
         Args:
             params (dict): parameters
+            node (rclpy.node.Node): ROS2 node
         """
         self.params = params
         self.node = node
@@ -46,10 +48,11 @@ class CosPlace(object):
             self.params['frontend.nn_checkpoint'] = join(
                 pkg_folder, self.params['frontend.nn_checkpoint'])
 
-            if torch.cuda.is_available():
-                self.device = torch.device("cuda")
-            else:
-                self.device = torch.device("cpu")
+            self.device = self.params['torch_device']
+            # if torch.cuda.is_available():
+            #     self.device = torch.device("cuda")
+            # else:
+            #     self.device = torch.device("cpu")
 
             self.descriptor_dim = self.params[
                 'frontend.cosplace.descriptor_dim']

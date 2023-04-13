@@ -135,10 +135,12 @@ class NetVLAD(object):
     """
 
     def __init__(self, params, node):
-        """Initialization
+        """
+        Initialization
 
         Args:
             params (dict): parameters
+            node (rclpy.node.Node): ROS2 node
         """
         self.params = params
         self.node = node
@@ -154,10 +156,11 @@ class NetVLAD(object):
                 self.node.get_parameter(
                     'frontend.netvlad.pca_checkpoint').value)
 
-            if torch.cuda.is_available():
-                self.device = torch.device("cuda")
-            else:
-                self.device = torch.device("cpu")
+            self.device = self.params['torch_device']
+            # if torch.cuda.is_available():
+            #     self.device = torch.device("cuda")
+            # else:
+            #     self.device = torch.device("cpu")
 
             encoder_dim = 512
             encoder = models.vgg16(pretrained=True)

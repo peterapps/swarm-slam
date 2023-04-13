@@ -2,6 +2,7 @@
 # Loop Closure Detection service
 # Abstraction to support multiple implementations of loop closure detection for benchmarking
 
+import torch
 import rclpy
 from rclpy.node import Node
 from rclpy.clock import Clock
@@ -19,28 +20,49 @@ class LoopClosureDetection(Node):
 
         self.declare_parameters(
             namespace='',
-            parameters=[('frontend.similarity_threshold', None),
-                        ('frontend.global_descriptor_technique', None),
-                        ('frontend.netvlad.pca_checkpoint', None), ('frontend.nn_checkpoint', None),
-                        ('robot_id', None), ('max_nb_robots', None),
-                        ('frontend.inter_robot_loop_closure_budget', 5),
-                        ('frontend.inter_robot_detection_period_sec', 5),
-                        ('frontend.nb_best_matches', 10), ('frontend.image_crop_size', None),
-                        ('frontend.intra_loop_min_inbetween_keyframes', 10),
+            parameters=[('robot_id', None), 
+                        ('max_nb_robots', None),
+                        # Neighbor Management
                         ('neighbor_management.max_heartbeat_delay_sec', 5),
                         ('neighbor_management.init_delay_sec', 5),
                         ('neighbor_management.heartbeat_period_sec', 0.5),
-                        ('frontend.detection_publication_period_sec', 1.0),
-                        ('frontend.detection_publication_max_elems_per_msg',
-                         10), ('neighbor_management.enable_neighbor_monitoring', False),
+                        ('neighbor_management.enable_neighbor_monitoring', False),
+                        # Loop Closure Networking Settings
                         ('frontend.enable_intra_robot_loop_closures', False),
-                        ('frontend.global_descriptors_topic', "global_descriptors"),
+                        ('frontend.intra_loop_min_inbetween_keyframes', 10),
+
+                        ('frontend.inter_robot_loop_closure_budget', 5),
+                        ('frontend.inter_robot_detection_period_sec', 5),
                         ('frontend.inter_robot_matches_topic', "inter_robot_matches"),
-                        ('frontend.enable_sparsification', True),
                         ('frontend.use_vertex_cover_selection', True),
+                        
+                        ('frontend.detection_publication_period_sec', 1.0),
+                        ('frontend.detection_publication_max_elems_per_msg', 10), 
+
+                        # Loop Closure Technique Specifics
+                        ('frontend.sensor_type', "stereo"),
+                        ('frontend.global_descriptor_technique', None),
+                        ('frontend.global_descriptors_topic', "global_descriptors"),
+                        ('frontend.enable_sparsification', True),
+                        ('frontend.similarity_threshold', None),
+                        ('frontend.nb_best_matches', 10), 
+
+                        # Visual (NetVLAD & COSPLACE)
+                        ('frontend.nn_checkpoint', 'disable'),
+                        ('frontend.image_crop_size', None),
+                        # NetVLAD
+                        ('frontend.netvlad.pca_checkpoint', None), 
+                        # Cosplace
                         ('frontend.cosplace.descriptor_dim', 64),
                         ('frontend.cosplace.backbone', "resnet18"),
-                        ('frontend.sensor_type', "stereo"),
+                        # SG-PR
+                        ('frontend.sg_pr.model', None),
+                        ('frontend.sg_pr.model_config', None),
+                        ('frontend.sg_pr.graph.node_num', None),
+                        ('frontend.sg_pr.graph.number_of_labels', None),
+                        
+                        
+                        # Evaluation
                         ('evaluation.enable_logs', False),
                         ('evaluation.enable_sparsification_comparison', False),
                         ])
@@ -93,6 +115,21 @@ class LoopClosureDetection(Node):
             'evaluation.enable_logs').value
         self.params["evaluation.enable_sparsification_comparison"] = self.get_parameter(
             'evaluation.enable_sparsification_comparison').value
+
+        self.params['frontend.sg_pr.model'] = self.get_parameter(
+            'frontend.sg_pr.model').value
+        self.params['frontend.sg_pr.model_config'] = self.get_parameter(
+            'frontend.sg_pr.model_config').value
+        self.params['frontend.sg_pr.graph.node_num'] = self.get_parameter(
+            'frontend.sg_pr.graph.node_num').value
+        self.params['frontend.sg_pr.graph.number_of_labels'] = self.get_parameter(
+            'frontend.sg_pr.graph.number_of_labels').value
+        
+        if torch.cuda.is_available():
+            self.device = torch.device("cuda")
+        else:
+            self.device = torch.device("cpu")
+        self.params['torch_device'] = self.device
 
         self.glcd = GlobalDescriptorLoopClosureDetection(
             self.params, self)
