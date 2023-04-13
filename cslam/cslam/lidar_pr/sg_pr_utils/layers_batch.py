@@ -4,12 +4,13 @@ class AttentionModule(torch.nn.Module):
     """
     SimGNN Attention Module to make a pass on graph.
     """
-    def __init__(self, args):
+    def __init__(self, args, device):
         """
         :param args: Arguments object.
         """
         super(AttentionModule, self).__init__()
         self.args = args
+        self.device = device
         self.setup_weights()
         self.init_parameters()
 
@@ -18,6 +19,7 @@ class AttentionModule(torch.nn.Module):
         Defining weights.
         """
         self.weight_matrix = torch.nn.Parameter(torch.Tensor(self.args.filters_3, self.args.filters_3)) 
+        self.weight_matrix = self.weight_matrix.to(device=self.device)
         
     def init_parameters(self):
         """
@@ -42,12 +44,13 @@ class TenorNetworkModule(torch.nn.Module):
     """
     SimGNN Tensor Network module to calculate similarity vector.
     """
-    def __init__(self,args):
+    def __init__(self,args, device):
         """
         :param args: Arguments object.
         """
         super(TenorNetworkModule, self).__init__()
         self.args = args
+        self.device = device
         self.setup_weights()
         self.init_parameters()
 
@@ -56,8 +59,13 @@ class TenorNetworkModule(torch.nn.Module):
         Defining weights.
         """
         self.weight_matrix = torch.nn.Parameter(torch.Tensor(self.args.filters_3, self.args.filters_3, self.args.tensor_neurons))
+        self.weight_matrix = self.weight_matrix.to(device=self.device)
+        
         self.weight_matrix_block = torch.nn.Parameter(torch.Tensor(self.args.tensor_neurons, 2*self.args.filters_3))
+        self.weight_matrix_block = self.weight_matrix_block.to(device=self.device)
+        
         self.bias = torch.nn.Parameter(torch.Tensor(self.args.tensor_neurons, 1))
+        self.bias = self.bias.to(device=self.device)
 
     def init_parameters(self):
         """

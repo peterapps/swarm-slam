@@ -1,18 +1,18 @@
-import time
+# import time
 import torch
-import random
-import numpy as np
-from tqdm import tqdm, trange
+# import random
+# import numpy as np
+# from tqdm import tqdm, trange
 # from torch_geometric.nn import GCNConv
 from layers_batch import AttentionModule, TenorNetworkModule
 from utils import *
-from tensorboardX import SummaryWriter
+# from tensorboardX import SummaryWriter
 # from warmup_scheduler import GradualWarmupScheduler
 import os
 import dgcnn as dgcnn
 import torch.nn as nn
-from collections import OrderedDict
-from sklearn import metrics
+# from collections import OrderedDict
+# from sklearn import metrics
 
 
 class SG(torch.nn.Module):
@@ -21,14 +21,16 @@ class SG(torch.nn.Module):
     https://arxiv.org/abs/1808.05689
     """
 
-    def __init__(self, args, number_of_labels):
+    def __init__(self, args, number_of_labels, device):
         """
         :param args: Arguments object.
         :param number_of_labels: Number of node labels.
+        :param device: torch device object
         """
         super(SG, self).__init__()
         self.args = args
         self.number_labels = number_of_labels
+        self.device = device
         self.setup_layers()
 
     def calculate_bottleneck_features(self):
@@ -42,38 +44,38 @@ class SG(torch.nn.Module):
         Creating the layers.
         """
         self.calculate_bottleneck_features()
-        self.attention = AttentionModule(self.args)
-        self.tensor_network = TenorNetworkModule(self.args)
-        self.fully_connected_first = torch.nn.Linear(self.feature_count, self.args.bottle_neck_neurons)
-        self.scoring_layer = torch.nn.Linear(self.args.bottle_neck_neurons, 1)
+        self.attention = AttentionModule(self.args, self.device)
+        self.tensor_network = TenorNetworkModule(self.args, self.device)
+        self.fully_connected_first = torch.nn.Linear(self.feature_count, self.args.bottle_neck_neurons).to(device=self.device)
+        self.scoring_layer = torch.nn.Linear(self.args.bottle_neck_neurons, 1).to(device=self.device)
         bias_bool = False # TODO
         self.dgcnn_s_conv1 = nn.Sequential(
             nn.Conv2d(3*2, self.args.filters_1, kernel_size=1, bias=bias_bool),
             nn.BatchNorm2d(self.args.filters_1),
-            nn.LeakyReLU(negative_slope=0.2))
+            nn.LeakyReLU(negative_slope=0.2)).to(device=self.device)
         self.dgcnn_f_conv1 = nn.Sequential(
             nn.Conv2d(self.number_labels * 2, self.args.filters_1, kernel_size=1, bias=bias_bool),
             nn.BatchNorm2d(self.args.filters_1),
-            nn.LeakyReLU(negative_slope=0.2))
+            nn.LeakyReLU(negative_slope=0.2)).to(device=self.device)
         self.dgcnn_s_conv2 = nn.Sequential(
             nn.Conv2d(self.args.filters_1*2, self.args.filters_2, kernel_size=1, bias=bias_bool),
             nn.BatchNorm2d(self.args.filters_2),
-            nn.LeakyReLU(negative_slope=0.2))
+            nn.LeakyReLU(negative_slope=0.2)).to(device=self.device)
         self.dgcnn_f_conv2 = nn.Sequential(
             nn.Conv2d(self.args.filters_1 * 2, self.args.filters_2, kernel_size=1, bias=bias_bool),
             nn.BatchNorm2d(self.args.filters_2),
-            nn.LeakyReLU(negative_slope=0.2))
+            nn.LeakyReLU(negative_slope=0.2)).to(device=self.device)
         self.dgcnn_s_conv3 = nn.Sequential(
             nn.Conv2d(self.args.filters_2*2, self.args.filters_3, kernel_size=1, bias=bias_bool),
             nn.BatchNorm2d(self.args.filters_3),
-            nn.LeakyReLU(negative_slope=0.2))
+            nn.LeakyReLU(negative_slope=0.2)).to(device=self.device)
         self.dgcnn_f_conv3 = nn.Sequential(
             nn.Conv2d(self.args.filters_2 * 2, self.args.filters_3, kernel_size=1, bias=bias_bool),
             nn.BatchNorm2d(self.args.filters_3),
-            nn.LeakyReLU(negative_slope=0.2))
+            nn.LeakyReLU(negative_slope=0.2)).to(device=self.device)
         self.dgcnn_conv_end = nn.Sequential(nn.Conv1d(self.args.filters_3 * 2,
                                                       self.args.filters_3, kernel_size=1, bias=bias_bool),
-                                            nn.BatchNorm1d(self.args.filters_3), nn.LeakyReLU(negative_slope=0.2))
+                                            nn.BatchNorm1d(self.args.filters_3), nn.LeakyReLU(negative_slope=0.2)).to(device=self.device)
 
 
     def dgcnn_conv_pass(self, x):
@@ -116,8 +118,8 @@ class SG(torch.nn.Module):
         :return score: Similarity score.
         """
 
-        features_1 = data["features_1"] # .cuda(self.args.gpu)
-        features_2 = data["features_2"] # .cuda(self.args.gpu)
+        features_1 = data["features_1"].to(device=self.device) # .cuda(self.args.gpu)
+        features_2 = data["features_2"].to(device=self.device) # .cuda(self.args.gpu)
 
         # features B x (3+label_num) x node_num
         abstract_features_1 = self.dgcnn_conv_pass(features_1) # node_num x feature_size(filters-3)
@@ -138,6 +140,7 @@ class SG(torch.nn.Module):
         return score, attention_scores_1, attention_scores_2
 
 
+'''
 class SGTrainer(object):
     """
     SG model trainer.
@@ -205,109 +208,109 @@ class SGTrainer(object):
         print(self.global_labels)
         print(self.number_of_labels)
 
-    def create_batches(self, split="train"):
-        """
-        Creating batches from the training graph list.
-        :return batches: List of lists with batches.
-        """
-        if split == "train":
-            random.shuffle(self.training_graphs)
-            batches = [self.training_graphs[graph:graph + self.args.batch_size] for graph in
-                       range(0, len(self.training_graphs), self.args.batch_size)]
-        else:
-            random.shuffle(self.evaling_graphs)
-            batches = [self.evaling_graphs[graph:graph + self.args.batch_size] for graph in
-                       range(0, len(self.evaling_graphs), self.args.batch_size)]
-        return batches
+    # def create_batches(self, split="train"):
+    #     """
+    #     Creating batches from the training graph list.
+    #     :return batches: List of lists with batches.
+    #     """
+    #     if split == "train":
+    #         random.shuffle(self.training_graphs)
+    #         batches = [self.training_graphs[graph:graph + self.args.batch_size] for graph in
+    #                    range(0, len(self.training_graphs), self.args.batch_size)]
+    #     else:
+    #         random.shuffle(self.evaling_graphs)
+    #         batches = [self.evaling_graphs[graph:graph + self.args.batch_size] for graph in
+    #                    range(0, len(self.evaling_graphs), self.args.batch_size)]
+    #     return batches
 
-    def augment_data(self,batch_xyz_1):
-        # batch_xyz_1 = flip_point_cloud(batch_xyz_1)
-        batch_xyz_1 = rotate_point_cloud(batch_xyz_1)
-        batch_xyz_1 = jitter_point_cloud(batch_xyz_1)
-        batch_xyz_1 = random_scale_point_cloud(batch_xyz_1)
-        batch_xyz_1 = rotate_perturbation_point_cloud(batch_xyz_1)
-        batch_xyz_1 = shift_point_cloud(batch_xyz_1)
-        return batch_xyz_1
+    # def augment_data(self,batch_xyz_1):
+    #     # batch_xyz_1 = flip_point_cloud(batch_xyz_1)
+    #     batch_xyz_1 = rotate_point_cloud(batch_xyz_1)
+    #     batch_xyz_1 = jitter_point_cloud(batch_xyz_1)
+    #     batch_xyz_1 = random_scale_point_cloud(batch_xyz_1)
+    #     batch_xyz_1 = rotate_perturbation_point_cloud(batch_xyz_1)
+    #     batch_xyz_1 = shift_point_cloud(batch_xyz_1)
+    #     return batch_xyz_1
 
-    def pc_normalize(self, pc):
-        """ pc: NxC, return NxC """
-        l = pc.shape[0]
-        centroid = np.mean(pc, axis=0)
-        pc = pc - centroid
-        m = np.max(np.sqrt(np.sum(pc**2, axis=1)))
-        pc = pc / m
-        return pc
+    # def pc_normalize(self, pc):
+    #     """ pc: NxC, return NxC """
+    #     l = pc.shape[0]
+    #     centroid = np.mean(pc, axis=0)
+    #     pc = pc - centroid
+    #     m = np.max(np.sqrt(np.sum(pc**2, axis=1)))
+    #     pc = pc / m
+    #     return pc
 
-    def prosess_for_torch(self, data, training=True):
-        """
-        Transferring the data to torch and creating a hash table with the indices, features and target.
-        :param data: Data dictionary.
-        :return new_data: Dictionary of Numpy arrays, which should be casted to Torch Tensors.
-        """
-        # data_ori = data.copy()
-        # print("data[edge1]: ", data["edges_1"])  # debug
+    # def prosess_for_torch(self, data, training=True):
+    #     """
+    #     Transferring the data to torch and creating a hash table with the indices, features and target.
+    #     :param data: Data dictionary.
+    #     :return new_data: Dictionary of Numpy arrays, which should be casted to Torch Tensors.
+    #     """
+    #     # data_ori = data.copy()
+    #     # print("data[edge1]: ", data["edges_1"])  # debug
 
-        node_num_1 = len(data["nodes_1"])
-        node_num_2 = len(data["nodes_2"])
-        if node_num_1 > self.args.node_num:
-            sampled_index_1 = np.random.choice(node_num_1, self.args.node_num, replace=False)
-            sampled_index_1.sort()
-            data["nodes_1"] = np.array(data["nodes_1"])[sampled_index_1].tolist()
-            data["centers_1"] = np.array(data["centers_1"])[sampled_index_1]
+    #     node_num_1 = len(data["nodes_1"])
+    #     node_num_2 = len(data["nodes_2"])
+    #     if node_num_1 > self.args.node_num:
+    #         sampled_index_1 = np.random.choice(node_num_1, self.args.node_num, replace=False)
+    #         sampled_index_1.sort()
+    #         data["nodes_1"] = np.array(data["nodes_1"])[sampled_index_1].tolist()
+    #         data["centers_1"] = np.array(data["centers_1"])[sampled_index_1]
 
-        elif node_num_1 < self.args.node_num:
-            data["nodes_1"] = np.concatenate(
-                (np.array(data["nodes_1"]), -np.ones(self.args.node_num - node_num_1))).tolist()  # padding 0
-            data["centers_1"] = np.concatenate(
-                (np.array(data["centers_1"]), np.zeros((self.args.node_num - node_num_1,3))))  # padding 0
+    #     elif node_num_1 < self.args.node_num:
+    #         data["nodes_1"] = np.concatenate(
+    #             (np.array(data["nodes_1"]), -np.ones(self.args.node_num - node_num_1))).tolist()  # padding 0
+    #         data["centers_1"] = np.concatenate(
+    #             (np.array(data["centers_1"]), np.zeros((self.args.node_num - node_num_1,3))))  # padding 0
 
-        if node_num_2 > self.args.node_num:
-            sampled_index_2 = np.random.choice(node_num_2, self.args.node_num, replace=False)
-            sampled_index_2.sort()
-            data["nodes_2"] = np.array(data["nodes_2"])[sampled_index_2].tolist()
-            data["centers_2"] = np.array(data["centers_2"])[sampled_index_2]  # node_num x 3
-        elif node_num_2 < self.args.node_num:
-            data["nodes_2"] = np.concatenate((np.array(data["nodes_2"]), -np.ones(self.args.node_num - node_num_2))).tolist()
-            data["centers_2"] = np.concatenate(
-                (np.array(data["centers_2"]), np.zeros((self.args.node_num - node_num_2, 3))))  # padding 0
+    #     if node_num_2 > self.args.node_num:
+    #         sampled_index_2 = np.random.choice(node_num_2, self.args.node_num, replace=False)
+    #         sampled_index_2.sort()
+    #         data["nodes_2"] = np.array(data["nodes_2"])[sampled_index_2].tolist()
+    #         data["centers_2"] = np.array(data["centers_2"])[sampled_index_2]  # node_num x 3
+    #     elif node_num_2 < self.args.node_num:
+    #         data["nodes_2"] = np.concatenate((np.array(data["nodes_2"]), -np.ones(self.args.node_num - node_num_2))).tolist()
+    #         data["centers_2"] = np.concatenate(
+    #             (np.array(data["centers_2"]), np.zeros((self.args.node_num - node_num_2, 3))))  # padding 0
 
-        new_data = dict()
-        features_1 = np.expand_dims(np.array(
-            [np.zeros(self.number_of_labels).tolist() if node == -1 else [
-                1.0 if self.global_labels[node] == label_index else 0 for label_index in self.global_labels.values()]
-             for node in data["nodes_1"]]), axis=0)
-        features_2 = np.expand_dims(np.array(
-            [np.zeros(self.number_of_labels).tolist() if node == -1 else [
-                1.0 if self.global_labels[node] == label_index else 0 for label_index in self.global_labels.values()]
-             for node in data["nodes_2"]]), axis=0)
-
-
-        # 1xnode_numx3
-        batch_xyz_1 = np.expand_dims(data["centers_1"], axis=0)
-        batch_xyz_2 = np.expand_dims(data["centers_2"], axis=0)
-        if training:
-            # random flip data
-            if random.random() > 0.5:
-                batch_xyz_1[:,:,0] = -batch_xyz_1[:,:,0]
-                batch_xyz_2[:, :, 0] = -batch_xyz_2[:, :, 0]
-            batch_xyz_1 = self.augment_data(batch_xyz_1)
-            batch_xyz_2 = self.augment_data(batch_xyz_2)
-        #  Bxnum_nodex(3+num_label) -> Bx(3+num_label)xnum_node
-        xyz_feature_1 = np.concatenate((batch_xyz_1, features_1), axis=2).transpose(0,2,1)
-        xyz_feature_2 = np.concatenate((batch_xyz_2, features_2), axis=2).transpose(0,2,1)
-        new_data["features_1"] = np.squeeze(xyz_feature_1)
-        new_data["features_2"] = np.squeeze(xyz_feature_2)
+    #     new_data = dict()
+    #     features_1 = np.expand_dims(np.array(
+    #         [np.zeros(self.number_of_labels).tolist() if node == -1 else [
+    #             1.0 if self.global_labels[node] == label_index else 0 for label_index in self.global_labels.values()]
+    #          for node in data["nodes_1"]]), axis=0)
+    #     features_2 = np.expand_dims(np.array(
+    #         [np.zeros(self.number_of_labels).tolist() if node == -1 else [
+    #             1.0 if self.global_labels[node] == label_index else 0 for label_index in self.global_labels.values()]
+    #          for node in data["nodes_2"]]), axis=0)
 
 
-        if data["distance"] <= self.args.p_thresh:  # TODO
-            new_data["target"] = 1.0
-        elif data["distance"] >= 20:
-            new_data["target"] = 0.0
-        else:
-            new_data["target"] = -100.0
-            print("distance error: ", data["distance"])
-            exit(-1)
-        return new_data
+    #     # 1xnode_numx3
+    #     batch_xyz_1 = np.expand_dims(data["centers_1"], axis=0)
+    #     batch_xyz_2 = np.expand_dims(data["centers_2"], axis=0)
+    #     if training:
+    #         # random flip data
+    #         if random.random() > 0.5:
+    #             batch_xyz_1[:,:,0] = -batch_xyz_1[:,:,0]
+    #             batch_xyz_2[:, :, 0] = -batch_xyz_2[:, :, 0]
+    #         batch_xyz_1 = self.augment_data(batch_xyz_1)
+    #         batch_xyz_2 = self.augment_data(batch_xyz_2)
+    #     #  Bxnum_nodex(3+num_label) -> Bx(3+num_label)xnum_node
+    #     xyz_feature_1 = np.concatenate((batch_xyz_1, features_1), axis=2).transpose(0,2,1)
+    #     xyz_feature_2 = np.concatenate((batch_xyz_2, features_2), axis=2).transpose(0,2,1)
+    #     new_data["features_1"] = np.squeeze(xyz_feature_1)
+    #     new_data["features_2"] = np.squeeze(xyz_feature_2)
+
+
+    #     if data["distance"] <= self.args.p_thresh:  # TODO
+    #         new_data["target"] = 1.0
+    #     elif data["distance"] >= 20:
+    #         new_data["target"] = 0.0
+    #     else:
+    #         new_data["target"] = -100.0
+    #         print("distance error: ", data["distance"])
+    #         exit(-1)
+    #     return new_data
     
 
     def transfer_to_torch(self, data):
@@ -345,40 +348,40 @@ class SGTrainer(object):
 
         return torch_data
 
-    def process_batch(self, batch, training=True):
-        """
-        Forward pass with a batch of data.
-        :param batch: Batch of graph pair locations.
-        :return loss: Loss on the batch.
-        """
-        self.optimizer.zero_grad()
-        losses = 0
-        batch_target = []
-        batch_feature_1 = []
-        batch_feature_2 = []
-        for graph_pair in batch:
-            data = process_pair(graph_pair)
-            data = self.prosess_for_torch(data, training)
-            batch_feature_1.append(data["features_1"])
-            batch_feature_2.append(data["features_2"])
-            batch_feature_1.append(data["features_2"])
-            batch_feature_2.append(data["features_1"])
-            target = data["target"]
-            batch_target.append(target)
-            batch_target.append(target)
-        data = dict()
-        data["features_1"] = torch.FloatTensor(np.array(batch_feature_1))
-        data["features_2"] = torch.FloatTensor(np.array(batch_feature_2))
-        data["target"] = torch.FloatTensor(np.array(batch_target))
-        prediction, _,_ = self.model(data)
-        losses = torch.mean(torch.nn.functional.binary_cross_entropy(prediction, data["target"])) #.cuda(self.args.gpu)))
-        if training:
-            losses.backward(retain_graph=True)
-            self.optimizer.step()
-        loss = losses.item()
-        pred_batch = prediction.cpu().detach().numpy().reshape(-1)
-        gt_batch = data["target"].cpu().detach().numpy().reshape(-1)
-        return loss, pred_batch, gt_batch
+    # def process_batch(self, batch, training=True):
+    #     """
+    #     Forward pass with a batch of data.
+    #     :param batch: Batch of graph pair locations.
+    #     :return loss: Loss on the batch.
+    #     """
+    #     self.optimizer.zero_grad()
+    #     losses = 0
+    #     batch_target = []
+    #     batch_feature_1 = []
+    #     batch_feature_2 = []
+    #     for graph_pair in batch:
+    #         data = process_pair(graph_pair)
+    #         data = self.prosess_for_torch(data, training)
+    #         batch_feature_1.append(data["features_1"])
+    #         batch_feature_2.append(data["features_2"])
+    #         batch_feature_1.append(data["features_2"])
+    #         batch_feature_2.append(data["features_1"])
+    #         target = data["target"]
+    #         batch_target.append(target)
+    #         batch_target.append(target)
+    #     data = dict()
+    #     data["features_1"] = torch.FloatTensor(np.array(batch_feature_1))
+    #     data["features_2"] = torch.FloatTensor(np.array(batch_feature_2))
+    #     data["target"] = torch.FloatTensor(np.array(batch_target))
+    #     prediction, _,_ = self.model(data)
+    #     losses = torch.mean(torch.nn.functional.binary_cross_entropy(prediction, data["target"])) #.cuda(self.args.gpu)))
+    #     if training:
+    #         losses.backward(retain_graph=True)
+    #         self.optimizer.step()
+    #     loss = losses.item()
+    #     pred_batch = prediction.cpu().detach().numpy().reshape(-1)
+    #     gt_batch = data["target"].cpu().detach().numpy().reshape(-1)
+    #     return loss, pred_batch, gt_batch
 
     # def fit(self):
     #     """
@@ -419,43 +422,43 @@ class SGTrainer(object):
     #                 print("\n best model saved ", dict_name)
     #             print("------------------------------")
 
-    def score(self, split = 'test'):
-        """
-        Scoring on the test set.
-        """
-        print("\n\nModel evaluation.\n")
-        self.model.eval()
-        self.scores = []
-        self.ground_truth = []
+    # def score(self, split = 'test'):
+    #     """
+    #     Scoring on the test set.
+    #     """
+    #     print("\n\nModel evaluation.\n")
+    #     self.model.eval()
+    #     self.scores = []
+    #     self.ground_truth = []
 
-        if split == "test":
-            splits = self.testing_graphs
-        elif split == "eval":
-            splits = self.evaling_graphs
-        else:
-            print("Check split: ", split)
-            splits = []
-            exit(-1)
+    #     if split == "test":
+    #         splits = self.testing_graphs
+    #     elif split == "eval":
+    #         splits = self.evaling_graphs
+    #     else:
+    #         print("Check split: ", split)
+    #         splits = []
+    #         exit(-1)
 
-        losses = 0
-        pred_db = []
-        gt_db = []
-        batches = self.create_batches(split="eval")
-        for index, batch in tqdm(enumerate(batches), total=len(batches), desc="Eval Batches"):
-            loss_score,pred_b,gt_b = self.process_batch(batch, False)
-            losses += loss_score
-            pred_db.extend(pred_b)
-            gt_db.extend(gt_b)
+    #     losses = 0
+    #     pred_db = []
+    #     gt_db = []
+    #     batches = self.create_batches(split="eval")
+    #     for index, batch in tqdm(enumerate(batches), total=len(batches), desc="Eval Batches"):
+    #         loss_score,pred_b,gt_b = self.process_batch(batch, False)
+    #         losses += loss_score
+    #         pred_db.extend(pred_b)
+    #         gt_db.extend(gt_b)
 
-        precision, recall, pr_thresholds = metrics.precision_recall_curve(gt_db, pred_db)
-        # calc F1-score
-        F1_score = 2 * precision * recall / (precision + recall)
-        F1_score = np.nan_to_num(F1_score)
-        F1_max_score = np.max(F1_score)
-        print("\nModel " + split + " F1_max_score: " + str(F1_max_score) + ".")
-        model_loss = losses / len(batches)
-        print("\nModel " + split + " loss: " + str(model_loss) + ".")
-        return model_loss, F1_max_score
+    #     precision, recall, pr_thresholds = metrics.precision_recall_curve(gt_db, pred_db)
+    #     # calc F1-score
+    #     F1_score = 2 * precision * recall / (precision + recall)
+    #     F1_score = np.nan_to_num(F1_score)
+    #     F1_max_score = np.max(F1_score)
+    #     print("\nModel " + split + " F1_max_score: " + str(F1_max_score) + ".")
+    #     model_loss = losses / len(batches)
+    #     print("\nModel " + split + " loss: " + str(model_loss) + ".")
+    #     return model_loss, F1_max_score
 
     # def print_evaluation(self):
     #     """
@@ -467,36 +470,36 @@ class SGTrainer(object):
     #     print("\nBaseline error: " + str(round(base_error, 5)) + ".")
     #     print("\nModel test error: " + str(round(model_error, 5)) + ".")
 
-    def eval_pair(self, pair_file):
-        # self.model.eval()
+    # def eval_pair(self, pair_file):
+    #     # self.model.eval()
 
-        data = process_pair(pair_file)
-        data = self.prosess_for_torch(data, False)
-        # target = data["target"]
+    #     data = process_pair(pair_file)
+    #     data = self.prosess_for_torch(data, False)
+    #     # target = data["target"]
 
-        # batch_target = []
-        # batch_feature_1 = []
-        # batch_feature_2 = []
-        # batch_feature_1.append(data["features_1"])
-        # batch_feature_2.append(data["features_2"])
-        # batch_target.append(target)
+    #     # batch_target = []
+    #     # batch_feature_1 = []
+    #     # batch_feature_2 = []
+    #     # batch_feature_1.append(data["features_1"])
+    #     # batch_feature_2.append(data["features_2"])
+    #     # batch_target.append(target)
         
-        data_torch = dict()
-        data_torch["features_1"] = torch.FloatTensor(data["features_1"]).unsqueeze(0)
-        data_torch["features_2"] = torch.FloatTensor(data["features_2"]).unsqueeze(0)
+    #     data_torch = dict()
+    #     data_torch["features_1"] = torch.FloatTensor(data["features_1"]).unsqueeze(0)
+    #     data_torch["features_2"] = torch.FloatTensor(data["features_2"]).unsqueeze(0)
 
-        # data_torch["features_1"] = torch.FloatTensor(np.array(batch_feature_1))
-        # data_torch["features_2"] = torch.FloatTensor(np.array(batch_feature_2))
-        # data_torch["target"] = torch.FloatTensor(np.array(batch_target))
+    #     # data_torch["features_1"] = torch.FloatTensor(np.array(batch_feature_1))
+    #     # data_torch["features_2"] = torch.FloatTensor(np.array(batch_feature_2))
+    #     # data_torch["target"] = torch.FloatTensor(np.array(batch_target))
         
-        self.model.eval()
-        result_1, result_2,result_3 = self.model(data_torch)
-        prediction = result_1.cpu().detach().numpy().reshape(-1)
-        att_weights_1 = result_2.cpu().detach().numpy().reshape(-1)
-        att_weights_2 = result_3.cpu().detach().numpy().reshape(-1)
+    #     self.model.eval()
+    #     result_1, result_2,result_3 = self.model(data_torch)
+    #     prediction = result_1.cpu().detach().numpy().reshape(-1)
+    #     att_weights_1 = result_2.cpu().detach().numpy().reshape(-1)
+    #     att_weights_2 = result_3.cpu().detach().numpy().reshape(-1)
 
-        # print("prediction shape: ", prediction.shape)
-        return prediction, att_weights_1, att_weights_2
+    #     # print("prediction shape: ", prediction.shape)
+    #     return prediction, att_weights_1, att_weights_2
 
     def eval_feature_pair(self, features_1, features_2):
         """
@@ -505,28 +508,11 @@ class SGTrainer(object):
         :param features_2: Torch tensor (1, _, _) with graph features for second in pair
         :return data: Dictionary with data.
         """
-        # print(features_1.shape, features_2.shape)
-        # self.model.eval()
-
-        # data = process_pair(pair_file)
-        # data = self.prosess_for_torch(data, False)
-        # target = data["target"]
-
-        # batch_target = []
-        # batch_feature_1 = []
-        # batch_feature_2 = []
-        # batch_feature_1.append(data["features_1"])
-        # batch_feature_2.append(data["features_2"])
-        # batch_target.append(target)
         
         data_torch = dict()
         data_torch["features_1"] = features_1
         data_torch["features_2"] = features_2
 
-        # data_torch["features_1"] = torch.FloatTensor(np.array(batch_feature_1))
-        # data_torch["features_2"] = torch.FloatTensor(np.array(batch_feature_2))
-        # data_torch["target"] = torch.FloatTensor(np.array(batch_target))
-        
         self.model.eval()
         result_1, result_2,result_3 = self.model(data_torch)
         prediction = result_1.cpu().detach().numpy().reshape(-1)
@@ -535,6 +521,7 @@ class SGTrainer(object):
 
         # print("prediction shape: ", prediction.shape)
         return prediction, att_weights_1, att_weights_2
+
     # def eval_batch_pair(self, batch):
     #     self.model.eval()
     #     batch_target = []
@@ -579,29 +566,29 @@ class SGTrainer(object):
     #     gt = np.array(batch_target).reshape(-1)
     #     return prediction, gt
 
-    def eval_batch_pair(self, batch):
-        self.model.eval()
+    # def eval_batch_pair(self, batch):
+    #     self.model.eval()
 
-        batch_target = []
-        batch_feature_1 = []
-        batch_feature_2 = []
-        for graph_pair in batch:
-            data = process_pair(graph_pair)
-            data = self.prosess_for_torch(data, False)
-            batch_feature_1.append(data["features_1"])
-            batch_feature_2.append(data["features_2"])
-            target = data["target"]
-            batch_target.append(target)
-        data = dict()
-        data["features_1"] = torch.FloatTensor(np.array(batch_feature_1))
-        data["features_2"] = torch.FloatTensor(np.array(batch_feature_2))
-        data["target"] = torch.FloatTensor(np.array(batch_target))
-        # forward_t = time.time()
-        prediction, _, _ = self.model(data)
-        # print("forward time: ", time.time() - forward_t)
-        prediction = prediction.cpu().detach().numpy().reshape(-1)
-        gt = np.array(batch_target).reshape(-1)
-        return prediction, gt
+    #     batch_target = []
+    #     batch_feature_1 = []
+    #     batch_feature_2 = []
+    #     for graph_pair in batch:
+    #         data = process_pair(graph_pair)
+    #         data = self.prosess_for_torch(data, False)
+    #         batch_feature_1.append(data["features_1"])
+    #         batch_feature_2.append(data["features_2"])
+    #         target = data["target"]
+    #         batch_target.append(target)
+    #     data = dict()
+    #     data["features_1"] = torch.FloatTensor(np.array(batch_feature_1))
+    #     data["features_2"] = torch.FloatTensor(np.array(batch_feature_2))
+    #     data["target"] = torch.FloatTensor(np.array(batch_target))
+    #     # forward_t = time.time()
+    #     prediction, _, _ = self.model(data)
+    #     # print("forward time: ", time.time() - forward_t)
+    #     prediction = prediction.cpu().detach().numpy().reshape(-1)
+    #     gt = np.array(batch_target).reshape(-1)
+    #     return prediction, gt
     
     def eval_feature_batch(self, batch_features_1: torch.tensor, batch_features_2: torch.tensor):
         self.model.eval()
@@ -610,7 +597,7 @@ class SGTrainer(object):
         data["features_1"] = batch_features_1
         data["features_2"] = batch_features_2
 
-        prediction, _, _ = self.model(data)
+        prediction, att_weights_1, att_weights_2 = self.model(data)
 
         prediction = prediction.cpu().detach().numpy().reshape(-1)
         return prediction
@@ -654,3 +641,5 @@ class SGTrainer(object):
     #     print("thresh: ", thresh)
     #     print("precision: ", precesion)
     #     print("recall:", recall)
+
+'''

@@ -8,29 +8,39 @@ class SGPR:
     TODO: (From: https://github.com/irapkaist/scancontext)
     """
     def __init__(self, params, node):
-        # self.node = node
-        self.args = args # TODO: Pass in args that are needed
+        self.params = params
+        self.node = node
 
-        self.global_labels = [i for i in range(12)] # 20
+        num_labels = self.params['frontend.sg_pr.graph.number_of_labels']
+
+        self.global_labels = [i for i in range(num_labels)] # 20
         self.global_labels = {val: index for index, val in enumerate(self.global_labels)}
         self.number_of_labels = len(self.global_labels)
+
+        self.node_num = self.params['frontend.sg_pr.graph.node_num']
         
         self.graph_generator = SemanticGraphGenerator()
-        # self.params = params
-        # self.shape = [20,60] # Same as in ScanContext paper
-        # self.max_length = 80 # Same as in ScanContext paper
+
+        self.enable = self.params['frontend.sg_pr.model'].lower(
+        ) != 'disable'
 
     def compute_embedding(self, keyframe):
-        scan, label = keyframe
-        scan_clusters = self.graph_generator.gen_labels(scan, label)
-        graph = self.graph_generator.gen_graphs(scan_clusters)
 
-        # transfer to torch
-        embedding: np.array = self._process_graph_embedding(graph)
+        if self.enable:
 
-        return embedding # dictionary
-        # desc = sc_utils.ptcloud2sc(keyframe, self.shape, self.max_length)
-        # return desc.reshape(-1)
+            scan, label = keyframe
+            scan_clusters = self.graph_generator.gen_labels(scan, label)
+            graph = self.graph_generator.gen_graphs(scan_clusters)
+
+            # transfer to torch
+            embedding: np.array = self._process_graph_embedding(graph)
+
+            return embedding # dictionary
+
+        else:
+            # Random descriptor if disabled
+            # Use this option only for testing
+            return np.random.rand(128) # TODO: What should this size be?
 
     def _process_graph_embedding(self, data):
         """
@@ -40,17 +50,17 @@ class SGPR:
         """
 
         node_num = len(data["nodes"])
-        if node_num > self.args.node_num:
-            sampled_index = np.random.choice(node_num, self.args.node_num, replace=False)
+        if node_num > self.node_num:
+            sampled_index = np.random.choice(node_num, self.node_num, replace=False)
             sampled_index.sort()
             data["nodes"] = np.array(data["nodes"])[sampled_index].tolist()
             data["centers"] = np.array(data["centers"])[sampled_index]
 
-        elif node_num < self.args.node_num:
+        elif node_num < self.node_num:
             data["nodes"] = np.concatenate(
-                (np.array(data["nodes"]), -np.ones(self.args.node_num - node_num))).tolist()  # padding 0
+                (np.array(data["nodes"]), -np.ones(self.node_num - node_num))).tolist()  # padding 0
             data["centers"] = np.concatenate(
-                (np.array(data["centers"]), np.zeros((self.args.node_num - node_num,3))))  # padding 0
+                (np.array(data["centers"]), np.zeros((self.node_num - node_num,3))))  # padding 0
 
         features = np.expand_dims(np.array(
             [np.zeros(self.number_of_labels).tolist() if node == -1 else [
