@@ -1,3 +1,5 @@
 *
+!sg_pr/
+!sg_pr/**
 !.gitignore
 !download.sh
