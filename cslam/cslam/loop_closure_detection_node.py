@@ -38,7 +38,6 @@ class LoopClosureDetection(Node):
                         
                         ('frontend.detection_publication_period_sec', 1.0),
                         ('frontend.detection_publication_max_elems_per_msg', 10), 
-
                         # Loop Closure Technique Specifics
                         ('frontend.sensor_type', "stereo"),
                         ('frontend.global_descriptor_technique', None),
@@ -67,55 +66,64 @@ class LoopClosureDetection(Node):
                         ('evaluation.enable_sparsification_comparison', False),
                         ])
         self.params = {}
-        self.params['frontend.similarity_threshold'] = self.get_parameter(
-            'frontend.similarity_threshold').value
-        self.params['frontend.intra_loop_min_inbetween_keyframes'] = self.get_parameter(
-            'frontend.intra_loop_min_inbetween_keyframes').value
-        self.params['frontend.nb_best_matches'] = self.get_parameter(
-            'frontend.nb_best_matches').value
-        self.params['frontend.global_descriptor_technique'] = self.get_parameter(
-            'frontend.global_descriptor_technique').value
-        self.params['frontend.nn_checkpoint'] = self.get_parameter(
-            'frontend.nn_checkpoint').value
+
         self.params['robot_id'] = self.get_parameter('robot_id').value
         self.params['max_nb_robots'] = self.get_parameter('max_nb_robots').value
-        self.params['frontend.inter_robot_loop_closure_budget'] = self.get_parameter(
-            'frontend.inter_robot_loop_closure_budget').value
-        self.params['frontend.enable_intra_robot_loop_closures'] = self.get_parameter(
-            'frontend.enable_intra_robot_loop_closures').value
-        self.params['frontend.inter_robot_detection_period_sec'] = self.get_parameter(
-            'frontend.inter_robot_detection_period_sec').value
-        self.params["frontend.image_crop_size"] = self.get_parameter(
-            'frontend.image_crop_size').value
-        self.params["frontend.enable_sparsification"] = self.get_parameter(
-            'frontend.enable_sparsification').value
-        self.params["neighbor_management.enable_neighbor_monitoring"] = self.get_parameter(
-            'neighbor_management.enable_neighbor_monitoring').value
+        # Neighbor Management
         self.params["neighbor_management.max_heartbeat_delay_sec"] = self.get_parameter(
             'neighbor_management.max_heartbeat_delay_sec').value
         self.params["neighbor_management.init_delay_sec"] = self.get_parameter(
             'neighbor_management.init_delay_sec').value
         self.params["neighbor_management.heartbeat_period_sec"] = self.get_parameter(
             'neighbor_management.heartbeat_period_sec').value
+        self.params["neighbor_management.enable_neighbor_monitoring"] = self.get_parameter(
+            'neighbor_management.enable_neighbor_monitoring').value
+        # Loop Closure Networking Settings
+        self.params['frontend.enable_intra_robot_loop_closures'] = self.get_parameter(
+            'frontend.enable_intra_robot_loop_closures').value
+        self.params['frontend.intra_loop_min_inbetween_keyframes'] = self.get_parameter(
+            'frontend.intra_loop_min_inbetween_keyframes').value
+        
+        self.params['frontend.inter_robot_loop_closure_budget'] = self.get_parameter(
+            'frontend.inter_robot_loop_closure_budget').value
+        self.params['frontend.inter_robot_detection_period_sec'] = self.get_parameter(
+            'frontend.inter_robot_detection_period_sec').value
+        # TODO: Where is inter_robot_matches_topic
+        self.params["frontend.use_vertex_cover_selection"] = self.get_parameter(
+            'frontend.use_vertex_cover_selection').value
+
         self.params[
             "frontend.detection_publication_period_sec"] = self.get_parameter(
                 'frontend.detection_publication_period_sec').value
         self.params[
             "frontend.detection_publication_max_elems_per_msg"] = self.get_parameter(
                 'frontend.detection_publication_max_elems_per_msg').value
-        self.params["frontend.use_vertex_cover_selection"] = self.get_parameter(
-            'frontend.use_vertex_cover_selection').value
+        # Loop Closure Technique Specifics
+        self.params["frontend.sensor_type"] = self.get_parameter(
+            'frontend.sensor_type').value.lower()
+        self.params['frontend.global_descriptor_technique'] = self.get_parameter(
+            'frontend.global_descriptor_technique').value
+        # TODO: Where is global_descriptors_topic
+        self.params["frontend.enable_sparsification"] = self.get_parameter(
+            'frontend.enable_sparsification').value
+        self.params['frontend.similarity_threshold'] = self.get_parameter(
+            'frontend.similarity_threshold').value
+        self.params['frontend.nb_best_matches'] = self.get_parameter(
+            'frontend.nb_best_matches').value
+        
+        # Visual (NetVLAD & COSPLACE)
+        self.params['frontend.nn_checkpoint'] = self.get_parameter(
+            'frontend.nn_checkpoint').value
+        self.params["frontend.image_crop_size"] = self.get_parameter(
+            'frontend.image_crop_size').value
+        # NetVLAD
+        # TODO: Where is netvlad.pca_checkpoint
+        # Cosplace
         self.params["frontend.cosplace.descriptor_dim"] = self.get_parameter(
             'frontend.cosplace.descriptor_dim').value
         self.params["frontend.cosplace.backbone"] = self.get_parameter(
             'frontend.cosplace.backbone').value
-        self.params["frontend.sensor_type"] = self.get_parameter(
-            'frontend.sensor_type').value.lower()
-        self.params["evaluation.enable_logs"] = self.get_parameter(
-            'evaluation.enable_logs').value
-        self.params["evaluation.enable_sparsification_comparison"] = self.get_parameter(
-            'evaluation.enable_sparsification_comparison').value
-
+        # SG-PR
         self.params['frontend.sg_pr.model'] = self.get_parameter(
             'frontend.sg_pr.model').value
         self.params['frontend.sg_pr.model_config'] = self.get_parameter(
@@ -124,6 +132,12 @@ class LoopClosureDetection(Node):
             'frontend.sg_pr.graph.node_num').value
         self.params['frontend.sg_pr.graph.number_of_labels'] = self.get_parameter(
             'frontend.sg_pr.graph.number_of_labels').value
+        # Evaluation
+        self.params["evaluation.enable_logs"] = self.get_parameter(
+            'evaluation.enable_logs').value
+        self.params["evaluation.enable_sparsification_comparison"] = self.get_parameter(
+            'evaluation.enable_sparsification_comparison').value
+
         
         if torch.cuda.is_available():
             self.device = torch.device("cuda")
