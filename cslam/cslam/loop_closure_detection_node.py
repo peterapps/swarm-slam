@@ -60,7 +60,6 @@ class LoopClosureDetection(Node):
                         ('frontend.sg_pr.graph.node_num', None),
                         ('frontend.sg_pr.graph.number_of_labels', None),
                         
-                        
                         # Evaluation
                         ('evaluation.enable_logs', False),
                         ('evaluation.enable_sparsification_comparison', False),
@@ -88,7 +87,8 @@ class LoopClosureDetection(Node):
             'frontend.inter_robot_loop_closure_budget').value
         self.params['frontend.inter_robot_detection_period_sec'] = self.get_parameter(
             'frontend.inter_robot_detection_period_sec').value
-        # TODO: Where is inter_robot_matches_topic
+        self.params['frontend.inter_robot_matches_topic'] = self.get_parameter(
+            'frontend.inter_robot_matches_topic').value
         self.params["frontend.use_vertex_cover_selection"] = self.get_parameter(
             'frontend.use_vertex_cover_selection').value
 
@@ -103,7 +103,8 @@ class LoopClosureDetection(Node):
             'frontend.sensor_type').value.lower()
         self.params['frontend.global_descriptor_technique'] = self.get_parameter(
             'frontend.global_descriptor_technique').value
-        # TODO: Where is global_descriptors_topic
+        self.params['frontend.global_descriptors_topic'] = self.get_parameter(
+            'frontend.global_descriptors_topic').value
         self.params["frontend.enable_sparsification"] = self.get_parameter(
             'frontend.enable_sparsification').value
         self.params['frontend.similarity_threshold'] = self.get_parameter(
@@ -117,7 +118,8 @@ class LoopClosureDetection(Node):
         self.params["frontend.image_crop_size"] = self.get_parameter(
             'frontend.image_crop_size').value
         # NetVLAD
-        # TODO: Where is netvlad.pca_checkpoint
+        self.params["frontend.netvlad.pca_checkpoint"] = self.get_parameter(
+            'frontend.netvlad.pca_checkpoint').value
         # Cosplace
         self.params["frontend.cosplace.descriptor_dim"] = self.get_parameter(
             'frontend.cosplace.descriptor_dim').value
