@@ -2,31 +2,27 @@ from collections import OrderedDict
 from typing import Tuple, List, Dict
 import numpy as np
 
-from rclpy import node
-
 import torch
 
 from os.path import join, isfile
 
 from ament_index_python import get_package_share_directory
-from cslam.cslam.lidar_pr.sg_pr_utils.sg_net import SG
-from cslam.cslam.lidar_pr.sg_pr_utils.parser_sg import sgpr_args
+from cslam.lidar_pr.sg_pr_utils.sg_net import SG
+from cslam.lidar_pr.sg_pr_utils.parser_sg import sgpr_args
 
 class SGPRMatching(object):
     """
         Matching of description graphs using SG-PR network
     """
 
-    def __init__(self, params: Dict, node: node.Node):
+    def __init__(self, params: Dict):
         """
         Initialization
 
         Args:
             params (dict): parameters
-            node (ROS 2 node handle): node handle
         """
         self.params = params
-        self.node = node
         self.device = self.params['torch_device']
         
         # Set of graphs and associated IDs
@@ -71,10 +67,8 @@ class SGPRMatching(object):
             self.model = self.model.to(self.device)
             
         else:
-            print("Error: SG-PR model path is incorrect")
-            self.node.get_logger().error("Error: SG-PR model path is incorrect {}".format(model_file))
+            print("Error: SG-PR model path is incorrect {}".format(model_file))
             exit()
-        
 
         self.model.eval()
 

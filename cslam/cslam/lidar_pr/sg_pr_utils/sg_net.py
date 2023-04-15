@@ -1,10 +1,8 @@
 import torch
-
-from layers_batch import AttentionModule, TenorNetworkModule
-from utils import *
-
-import dgcnn as dgcnn
 import torch.nn as nn
+
+from cslam.lidar_pr.sg_pr_utils.layers_batch import AttentionModule, TenorNetworkModule
+import cslam.lidar_pr.sg_pr_utils.dgcnn as dgcnn
 
 
 class SG(torch.nn.Module):

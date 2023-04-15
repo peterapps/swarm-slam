@@ -22,7 +22,7 @@ class LoopClosureSparseMatching(object):
         if self.params["frontend.sensor_type"] == "lidar":
             self.local_nnsm = ScanContextMatching()
         elif self.params["frontend.sensor_type"] == "semantic-lidar":
-            self.local_nnsm = SGPRMatching()
+            self.local_nnsm = SGPRMatching(self.params)
         else:
             self.local_nnsm = NearestNeighborsMatching()
         self.other_robots_nnsm = {}
@@ -31,7 +31,7 @@ class LoopClosureSparseMatching(object):
                 if self.params["frontend.sensor_type"] == "lidar":
                     self.other_robots_nnsm[i] = ScanContextMatching()
                 elif self.params["frontend.sensor_type"] == "semantic-lidar":
-                    self.other_robots_nnsm[i] = SGPRMatching()
+                    self.other_robots_nnsm[i] = SGPRMatching(self.params)
                 else:
                     self.other_robots_nnsm[i] = NearestNeighborsMatching()
         # Initialize candidate selection algorithm

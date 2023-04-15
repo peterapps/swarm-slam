@@ -1,3 +1,4 @@
+from typing import List, Tuple
 import cslam.lidar_pr.scancontext_utils as sc_utils
 import numpy as np
 from scipy import spatial
@@ -20,7 +21,7 @@ class ScanContextMatching(object):
         self.items = dict()
         self.nb_items = 0
 
-    def add_item(self, descriptor, item):
+    def add_item(self, descriptor: np.ndarray, item: int):
         """Add item to the matching list
 
         Args:
@@ -43,7 +44,7 @@ class ScanContextMatching(object):
 
         self.nb_items = self.nb_items + 1
 
-    def search(self, query, k):
+    def search(self, query: np.ndarray, k: int) -> Tuple[List[int], np.ndarray]:
         """Search for nearest neighbors
 
         Args:
@@ -86,7 +87,7 @@ class ScanContextMatching(object):
             similarity = 1 - nn_dist # For now we return only 1 match, but we could return the n best matches
         return [self.items[nn_idx]], [similarity]
 
-    def search_best(self, query):
+    def search_best(self, query) -> Tuple[int, np.ndarray]:
         """Search for the nearest neighbor
             Implementation for compatibily only
 
