@@ -3,8 +3,6 @@ from typing import Tuple, List, Dict
 import numpy as np
 from scipy import spatial
 
-from rclpy import node
-
 import torch
 
 from os.path import join, exists, isfile, realpath, dirname
@@ -28,16 +26,14 @@ class SGPRMatching(object):
         Matching of description graphs using SG-PR network
     """
 
-    def __init__(self, params: Dict, node: node.Node):
+    def __init__(self, params: Dict):
         """
         Initialization
 
         Args:
             params (dict): parameters
-            node (ROS 2 node handle): node handle
         """
         self.params = params
-        self.node = node
         self.device = self.params['torch_device']
         
         # Set of graphs and associated IDs
@@ -85,10 +81,8 @@ class SGPRMatching(object):
 
             # self.model = torch.nn.DataParallel(self.model, device_ids=[self.args.gpu])
         else:
-            print("Error: SG-PR model path is incorrect")
-            self.node.get_logger().error("Error: SG-PR model path is incorrect {}".format(model_file))
+            print("Error: SG-PR model path is incorrect {}".format(model_file))
             exit()
-        
 
         self.model.eval()
 
