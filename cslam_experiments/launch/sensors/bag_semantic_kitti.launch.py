@@ -28,7 +28,7 @@ def launch_setup(context, *args, **kwargs):
                         'ros2', 'bag', 'play',
                         LaunchConfiguration('bag_file').perform(context), '-r',
                         LaunchConfiguration('rate'), '--remap',
-                        '/velodyne_points:=' +
+                        '/kitti/velo/pointcloud:=' +
                         LaunchConfiguration('namespace').perform(context) +
                         '/pointcloud',
                         '/kitti/oxts/gps/fix:=' +
