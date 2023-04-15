@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from typing import List, Tuple
 import numpy as np
 from scipy.spatial import distance
 
@@ -20,7 +21,7 @@ class NearestNeighborsMatching(object):
         if dim is not None:
             self.data = np.zeros((1000, dim), dtype='float32')
 
-    def add_item(self, vector, item):
+    def add_item(self, vector: np.ndarray, item: int):
         """Add item to the matching list
 
         Args:
@@ -39,7 +40,7 @@ class NearestNeighborsMatching(object):
         self.data[self.n] = vector
         self.n += 1
 
-    def search(self, query, k):  # searching from 100000 items consume 30ms
+    def search(self, query: np.ndarray, k: int) -> Tuple[List[int], np.ndarray]:  # searching from 100000 items consume 30ms
         """Search for nearest neighbors
 
         Args:
@@ -60,7 +61,7 @@ class NearestNeighborsMatching(object):
         ns = np.argsort(similarities)[::-1][:k]
         return [self.items[n] for n in ns], similarities[ns]
 
-    def search_best(self, query):
+    def search_best(self, query: np.ndarray) -> Tuple[int, np.ndarray]:
         """Search for the nearest neighbor
 
         Args:
