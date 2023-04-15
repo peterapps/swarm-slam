@@ -8,8 +8,8 @@ import torch
 from os.path import join, exists, isfile, realpath, dirname
 
 from ament_index_python import get_package_share_directory
-from cslam.cslam.lidar_pr.sg_pr_utils.sg_net import SG
-from cslam.cslam.lidar_pr.sg_pr_utils.parser_sg import sgpr_args
+from cslam.lidar_pr.sg_pr_utils.sg_net import SG
+from cslam.lidar_pr.sg_pr_utils.parser_sg import sgpr_args
 
 # SG-PR imports
 # import os

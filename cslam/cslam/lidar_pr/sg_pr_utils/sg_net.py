@@ -4,12 +4,12 @@ import torch
 # import numpy as np
 # from tqdm import tqdm, trange
 # from torch_geometric.nn import GCNConv
-from layers_batch import AttentionModule, TenorNetworkModule
-from utils import *
+from cslam.lidar_pr.sg_pr_utils.layers_batch import AttentionModule, TenorNetworkModule
+# from cslam.lidar_pr.sg_pr_utils.utils import *
 # from tensorboardX import SummaryWriter
 # from warmup_scheduler import GradualWarmupScheduler
 import os
-import dgcnn as dgcnn
+import cslam.lidar_pr.sg_pr_utils.dgcnn as dgcnn
 import torch.nn as nn
 # from collections import OrderedDict
 # from sklearn import metrics
