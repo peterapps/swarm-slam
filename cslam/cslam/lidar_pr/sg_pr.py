@@ -32,7 +32,7 @@ class SGPR:
 
         if self.enable:
 
-            scan, label = keyframe[:,:3], keyframe[:, 3:]
+            scan, label = keyframe[:,:3], keyframe[:, 4]
 
             scan_clusters = self.graph_generator.gen_labels(scan, label)
             graph: Dict[str, Union[float, int]] = self.graph_generator.gen_graphs(scan_clusters)
