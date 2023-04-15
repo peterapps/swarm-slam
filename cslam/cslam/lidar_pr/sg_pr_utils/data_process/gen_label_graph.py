@@ -5,6 +5,7 @@
 # import os
 # import threading
 # import yaml
+from typing import Dict, Union
 import numpy as np
 import pcl
 # import matplotlib.pyplot as plt
@@ -204,7 +205,7 @@ class SemanticGraphGenerator(object):
         # self.header2.stamp = self.node.get_clock().now().to_msg()
         # self.header2.frame_id = "velodyne"
     
-    def gen_labels(self, scan: np.ndarray, label: np.ndarray): # FLAGS, scan_name, label_name, label_output_dir):
+    def gen_labels(self, scan: np.ndarray, label: np.ndarray) -> np.ndarray: # FLAGS, scan_name, label_name, label_output_dir):
         # start = time.time()
         # open scan
         # TODO(yxm): downsampling
@@ -340,7 +341,7 @@ class SemanticGraphGenerator(object):
 
         return cluster      
 
-    def gen_graphs(self, scan): # FLAGS, scan_name, scan, graph_output_dir):
+    def gen_graphs(self, scan: np.ndarray) -> Dict[str, Union[float, int]]: # FLAGS, scan_name, scan, graph_output_dir):
         inst = scan[:, -1] # get instance label
         inst_label_set = list(set(inst))  # get nums of inst
         inst_label_set.sort()

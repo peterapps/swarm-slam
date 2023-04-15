@@ -1,9 +1,12 @@
 #!/usr/bin/env python
+from typing import Union
 from cslam.algebraic_connectivity_maximization import EdgeInterRobot
 import numpy as np
 
 import os
 from os.path import join, exists, isfile, realpath, dirname
+
+import cslam.utils.point_cloud2 as pc2_utils
 
 from cslam.loop_closure_sparse_matching import LoopClosureSparseMatching
 from cslam.broker import Broker
@@ -59,7 +62,7 @@ class GlobalDescriptorLoopClosureDetection(object):
             # global icp_utils
             # import cslam.lidar_pr.icp_utils as icp_utils
             self.node.get_logger().info('Using SG-PR.')
-            self.global_descriptor = SGPR()
+            self.global_descriptor = SGPR(self.params, self.node)
             self.keyframe_type = "semantic-pointcloud"
         else:
             from cslam.vpr.cosplace import CosPlace
@@ -395,7 +398,7 @@ class GlobalDescriptorLoopClosureDetection(object):
                 vertices[key1] = [[s.robot0_id], [s.robot0_keyframe_id]]
         return vertices
 
-    def receive_keyframe(self, msg):
+    def receive_keyframe(self, msg: Union[KeyframeRGB, KeyframePointCloud]):
         """Callback to add a keyframe 
 
         Args:
@@ -414,7 +417,8 @@ class GlobalDescriptorLoopClosureDetection(object):
         elif self.keyframe_type == "semantic-pointcloud":
             # TODO: break message into point cloud and semantic lables
             # This will be using SG_PR
-            embedding = self.global_descriptor.compute_embedding(msg)
+            embedding = self.global_descriptor.compute_embedding(
+                pc2_utils.read_points_numpy(msg, ['x', 'y', 'z', 'label']))
                 # icp_utils.ros_pointcloud_to_points(msg.pointcloud))
 
         self.add_global_descriptor_to_map(embedding, msg.id)

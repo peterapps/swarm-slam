@@ -1,6 +1,9 @@
 from collections import OrderedDict
+from typing import Tuple, List, Dict
 import numpy as np
 from scipy import spatial
+
+from rclpy import node
 
 import torch
 
@@ -8,7 +11,7 @@ from os.path import join, exists, isfile, realpath, dirname
 
 from ament_index_python import get_package_share_directory
 from cslam.cslam.lidar_pr.sg_pr_utils.sg_net import SG
-from cslam.cslam.sg_pr_utils.parser_sg import sgpr_args
+from cslam.cslam.lidar_pr.sg_pr_utils.parser_sg import sgpr_args
 
 # SG-PR imports
 # import os
@@ -22,10 +25,10 @@ from cslam.cslam.sg_pr_utils.parser_sg import sgpr_args
 
 class SGPRMatching(object):
     """
-    TODO: Nearest Neighbor matching of description vectors
+        Matching of description graphs using SG-PR network
     """
 
-    def __init__(self, params, node): # shape=[20,60], num_candidates=10, threshold=0.15): 
+    def __init__(self, params: Dict, node: node.Node):
         """
         Initialization
 
@@ -90,7 +93,7 @@ class SGPRMatching(object):
         self.model.eval()
 
 
-    def add_item(self, descriptor, item_id):
+    def add_item(self, descriptor: np.ndarray, item_id: int):
         """Add item to the matching list
 
         Args:
@@ -98,7 +101,7 @@ class SGPRMatching(object):
             item_id: identification info (e.g., int)
         """
 
-        descriptor_torch = torch.FloatTensor(descriptor)
+        descriptor_torch = torch.FloatTensor(descriptor, device=self.device)
         
         self.graphs = self.graphs.cat(descriptor_torch)
 
@@ -121,7 +124,7 @@ class SGPRMatching(object):
 
         # self.nb_items = self.nb_items + 1
 
-    def search(self, query, k):
+    def search(self, query: np.ndarray, k: int) -> Tuple[List[int], np.ndarray]:
         """Search for nearest neighbors
 
         Args:
@@ -134,10 +137,13 @@ class SGPRMatching(object):
         if self.nb_items < 1:
             return [None], [None]
 
-        query_torch = torch.FloatTensor(query)
-
         graph_shape = self.graphs.shape[0]
-        scores, att_weights_1, att_weights_2 = self.trainer.eval_feature_batch(self.graphs, query_torch.repeat(graph_shape))
+
+        data = dict()
+        data["features_1"] = self.graphs
+        data["features_2"] = torch.FloatTensor(query, device=self.device).repeat(graph_shape)
+
+        scores, att_weights_1, att_weights_2 = self.model(data)
         
         scores_topk, idx_topk = torch.topk(scores, k)
 
@@ -207,7 +213,7 @@ class SGPRMatching(object):
         #     similarity = nn_score
         # return [self.items[nn_idx]], [similarity]
 
-    def search_best(self, query):
+    def search_best(self, query: np.ndarray) -> Tuple[int, np.ndarray]:
         """Search for the nearest neighbor
             Implementation for compatibily only
 

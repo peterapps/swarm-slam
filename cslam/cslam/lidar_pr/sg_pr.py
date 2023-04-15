@@ -1,4 +1,8 @@
+from typing import Dict, Union
+
 import numpy as np
+
+from rclpy import node
 
 from cslam.lidar_pr.sg_pr_utils.data_process.gen_label_graph import SemanticGraphGenerator
 
@@ -7,7 +11,7 @@ class SGPR:
     TODO: (Scan Context descriptor for point clouds)
     TODO: (From: https://github.com/irapkaist/scancontext)
     """
-    def __init__(self, params, node):
+    def __init__(self, params: Dict, node: node.Node):
         self.params = params
         self.node = node
 
@@ -24,25 +28,26 @@ class SGPR:
         self.enable = self.params['frontend.sg_pr.model'].lower(
         ) != 'disable'
 
-    def compute_embedding(self, keyframe):
+    def compute_embedding(self, keyframe: np.ndarray) -> np.ndarray:
 
         if self.enable:
 
-            scan, label = keyframe
+            scan, label = keyframe[:,:3], keyframe[:, 3:]
+
             scan_clusters = self.graph_generator.gen_labels(scan, label)
-            graph = self.graph_generator.gen_graphs(scan_clusters)
+            graph: Dict[str, Union[float, int]] = self.graph_generator.gen_graphs(scan_clusters)
 
             # transfer to torch
-            embedding: np.array = self._process_graph_embedding(graph)
+            embedding= self._process_graph_embedding(graph)
 
-            return embedding # dictionary
+            return embedding
 
         else:
             # Random descriptor if disabled
             # Use this option only for testing
             return np.random.rand(128) # TODO: What should this size be?
 
-    def _process_graph_embedding(self, data):
+    def _process_graph_embedding(self, data: Dict[str, Union[float, int]]) -> np.ndarray:
         """
         Transferring the data to torch and creating a hash table with the indices, features and target.
         :param data: Data dictionary of 
