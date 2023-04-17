@@ -12,13 +12,15 @@ from launch.substitutions import LaunchConfiguration
 
 
 def launch_setup(context, *args, **kwargs):
+    print(get_package_share_directory("cslam_experiments"))
     config_path = os.path.join(
         get_package_share_directory("cslam_experiments"), "config/")
     config_file = LaunchConfiguration('config_file').perform(context)
+    print('\n\nconfig_file is ', config_file, '\n\n\n')
 
     # Params
     max_nb_robots = int(LaunchConfiguration('max_nb_robots').perform(context))
-    dataset = "KITTI" + LaunchConfiguration('sequence').perform(context)
+    dataset = "KITTI-" + LaunchConfiguration('sequence').perform(context)
     robot_delay_s = LaunchConfiguration('robot_delay_s').perform(context)  
     launch_delay_s = LaunchConfiguration('launch_delay_s').perform(context)  
     rate = float(LaunchConfiguration('rate').perform(context))
@@ -52,7 +54,7 @@ def launch_setup(context, *args, **kwargs):
 
         bag_file = os.path.join(
             get_package_share_directory("cslam_experiments"), "data",
-            dataset + "_" + str(max_nb_robots) + "robots", dataset + "-" + str(i))
+            dataset, dataset + "-part" + str(i+1))
 
         bag_proc = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
@@ -127,8 +129,8 @@ def launch_setup(context, *args, **kwargs):
 def generate_launch_description():
 
     return LaunchDescription([
-        DeclareLaunchArgument('max_nb_robots', default_value='5'),
-        DeclareLaunchArgument('sequence', default_value='360-09'),
+        DeclareLaunchArgument('max_nb_robots', default_value='2'),
+        DeclareLaunchArgument('sequence', default_value='360-Semantic-00'),
         DeclareLaunchArgument('robot_delay_s', default_value='350', description="Delay between launching each robot. Ajust depending on the computing power of your machine."),
         DeclareLaunchArgument('launch_delay_s', default_value='10', description="Delay between launching the bag and the robot. In order to let the robot initialize properly and not loose the first bag data frames."),
         DeclareLaunchArgument('config_file',
@@ -136,6 +138,6 @@ def generate_launch_description():
                               description=''),
         DeclareLaunchArgument('rate', default_value='0.5'),
         DeclareLaunchArgument('enable_simulated_rendezvous', default_value='true'),
-        DeclareLaunchArgument('rendezvous_config', default_value='kitti09_5robots.config'),
+        DeclareLaunchArgument('rendezvous_config', default_value='kitti00_2robots_lidar.config'),
         OpaqueFunction(function=launch_setup)
     ])
