@@ -49,6 +49,7 @@ def launch_setup(context, *args, **kwargs):
                         '/kitti/oxts/imu:=' +
                         LaunchConfiguration('namespace').perform(context) +
                         '/imu/data',
+                        # '/tf_static:=null_tf_static',
                     ],
                     name='bag',
                     output='screen',

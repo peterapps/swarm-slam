@@ -418,8 +418,18 @@ class GlobalDescriptorLoopClosureDetection(object):
                 icp_utils.ros_pointcloud_to_points(msg.pointcloud))
         elif self.keyframe_type == "semantic-pointcloud":
             # This will be using SG_PR
-            embedding = self.global_descriptor.compute_embedding(
-                pc2_utils.read_points_numpy(msg, ['x', 'y', 'z', 'label']))
+            cloud = msg.pointcloud
+
+            field_names = [field.name for field in cloud.fields if field.name in ['x', 'y', 'z', 'label']]
+            structured_numpy_array = pc2_utils.read_points(
+                cloud, field_names, skip_nans=False, uvs=None, reshape_organized_cloud=None)
+            from numpy.lib.recfunctions import structured_to_unstructured
+            unstructured_numpy_array = structured_to_unstructured(structured_numpy_array)
+
+            embedding = self.global_descriptor.compute_embedding(unstructured_numpy_array)
+            # embedding = self.global_descriptor.compute_embedding(
+            #     pc2_utils.read_points_numpy(msg.pointcloud, ['x', 'y', 'z', 'label']))
+            
                 # icp_utils.ros_pointcloud_to_points(msg.pointcloud))
 
         self.add_global_descriptor_to_map(embedding, msg.id)
