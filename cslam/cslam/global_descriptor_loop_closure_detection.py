@@ -430,7 +430,8 @@ class GlobalDescriptorLoopClosureDetection(object):
             # embedding = self.global_descriptor.compute_embedding(
             #     pc2_utils.read_points_numpy(msg.pointcloud, ['x', 'y', 'z', 'label']))
             
-                # icp_utils.ros_pointcloud_to_points(msg.pointcloud))
+            embedding = self.global_descriptor.compute_embedding(
+                icp_utils.ros_pointcloud_to_points(msg.pointcloud))
 
         self.add_global_descriptor_to_map(embedding, msg.id)
 

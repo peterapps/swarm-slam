@@ -144,7 +144,7 @@ def generate_launch_description():
         DeclareLaunchArgument('robot_delay_s', default_value='605', description="Delay between launching each robot. Ajust depending on the computing power of your machine."),
         DeclareLaunchArgument('launch_delay_s', default_value='10', description="Delay between launching the bag and the robot. In order to let the robot initialize properly and not loose the first bag data frames."),
         DeclareLaunchArgument('config_file',
-                              default_value='semantic_kitti_lidar.yaml',
+                              default_value='kitti_lidar.yaml',
                               description=''),
         DeclareLaunchArgument('rate', default_value='0.5'),
         DeclareLaunchArgument('enable_simulated_rendezvous', default_value='true'),
