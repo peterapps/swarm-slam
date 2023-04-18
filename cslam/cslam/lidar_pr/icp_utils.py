@@ -93,7 +93,11 @@ def Rt2T(R, t):
 def downsample(points, voxel_size):
     open3d_cloud = open3d.geometry.PointCloud()
     open3d_cloud.points = open3d.utility.Vector3dVector(points)
-    return open3d_cloud.voxel_down_sample(voxel_size=voxel_size)
+    cloud_downsampled, indices = open3d.geometry.voxel_down_sample_and_trace(open3d_cloud,
+                                                                             voxel_size, 
+                                                                             open3d_cloud.get_min_bound(),
+                                                                             open3d_cloud.get_max_bound())
+    return cloud_downsampled, indices
 
 
 def solve_teaser(src, dst, voxel_size, min_inliers):

@@ -33,6 +33,14 @@ class SGPR:
         if self.enable:
 
             scan, label = keyframe[:,:3], keyframe[:, 3:]
+            
+            self.node.get_logger().info('keyframe.shape: '+ str(keyframe.shape))
+            self.node.get_logger().info('scan.shape: '+ str(scan.shape))
+            self.node.get_logger().info('label.shape: '+ str(label.shape))
+
+            # print('scan.shape: ', scan.shape)
+            # print('label.shape: ', label.shape)
+
 
             scan_clusters = self.graph_generator.gen_labels(scan, label)
             graph: Dict[str, Union[float, int]] = self.graph_generator.gen_graphs(scan_clusters)
