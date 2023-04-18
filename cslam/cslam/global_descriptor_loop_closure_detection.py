@@ -311,8 +311,10 @@ class GlobalDescriptorLoopClosureDetection(object):
         Returns:
             list(int): matched keyframes
         """
+        
         if self.params['frontend.enable_intra_robot_loop_closures']:
             kf_match, _ = self.lcm.match_local_loop_closures(embedding, kf_id)
+            self.node.get_logger().info("Checking for intra loop closure: " + str(kf_match))
             if kf_match is not None:
                 msg = LocalKeyframeMatch()
                 msg.keyframe0_id = kf_id
@@ -415,7 +417,6 @@ class GlobalDescriptorLoopClosureDetection(object):
             embedding = self.global_descriptor.compute_embedding(
                 icp_utils.ros_pointcloud_to_points(msg.pointcloud))
         elif self.keyframe_type == "semantic-pointcloud":
-            # TODO: break message into point cloud and semantic lables
             # This will be using SG_PR
             embedding = self.global_descriptor.compute_embedding(
                 pc2_utils.read_points_numpy(msg, ['x', 'y', 'z', 'label']))

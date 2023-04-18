@@ -89,6 +89,7 @@ def launch_setup(context, *args, **kwargs):
         odom_processes.append(odom_proc)
 
     # KITTI specific transform
+    ### Our bag file already has these so they are not needed here
     tf_process = Node(package="tf2_ros",
                       executable="static_transform_publisher",
                       arguments="0 0 0 0 0 0 base_link velo_link".split(" "),
@@ -97,6 +98,14 @@ def launch_setup(context, *args, **kwargs):
                       executable="static_transform_publisher",
                       arguments="0 0 0 0 0 0 base_link imu_link".split(" "),
                       parameters=[])
+    # tf_process = Node(package="tf2_ros",
+    #                   executable="static_transform_publisher",
+    #                   arguments="0.333365 0.40075 0.795751 0.040117 -0.093453 0.994814 imu_link velo_link".split(" "),
+    #                   parameters=[])
+    # tf_process_imu = Node(package="tf2_ros",
+    #                   executable="static_transform_publisher",
+    #                   arguments="-1.405 0.32 0.92 0. 0. 0. base_link imu_link".split(" "),
+    #                   parameters=[])
 
     # Launch schedule
     schedule = []
@@ -131,7 +140,7 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('max_nb_robots', default_value='2'),
         DeclareLaunchArgument('sequence', default_value='360-Semantic-00'),
-        DeclareLaunchArgument('robot_delay_s', default_value='350', description="Delay between launching each robot. Ajust depending on the computing power of your machine."),
+        DeclareLaunchArgument('robot_delay_s', default_value='605', description="Delay between launching each robot. Ajust depending on the computing power of your machine."),
         DeclareLaunchArgument('launch_delay_s', default_value='10', description="Delay between launching the bag and the robot. In order to let the robot initialize properly and not loose the first bag data frames."),
         DeclareLaunchArgument('config_file',
                               default_value='kitti_lidar.yaml',

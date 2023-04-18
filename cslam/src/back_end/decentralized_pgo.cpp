@@ -252,6 +252,7 @@ void DecentralizedPGO::odometry_callback(
 
   if (enable_gps_recording_)
   {
+    // RCLCPP_WARN(node_->get_logger(), "New gps data (%d, %d).", msg->id, msg->gps);
     gps_data_.insert({msg->id, msg->gps});
   }
 
@@ -368,6 +369,7 @@ bool DecentralizedPGO::is_optimizer()
 }
 
 cslam_common_interfaces::msg::PoseGraph DecentralizedPGO::fill_pose_graph_msg(){
+  // std::cout << "fill_pose_graph_msg called \n\n";
   auto current_robots_ids = current_neighbors_ids_;
   current_robots_ids.robots.ids.push_back(robot_id_);
   return fill_pose_graph_msg(current_robots_ids.robots);
@@ -412,7 +414,9 @@ cslam_common_interfaces::msg::PoseGraph DecentralizedPGO::fill_pose_graph_msg(co
     }
   }
 
+  // RCLCPP_INFO(node_->get_logger(), "Some people are just dumb but...");
   if (enable_gps_recording_) {
+    // RCLCPP_INFO(node_->get_logger(), "Stupidity is an everyday event.");
     for (auto gps : gps_data_) {
       out_msg.gps_values_idx.push_back(gps.first);
       out_msg.gps_values.push_back(gps.second);
@@ -421,6 +425,7 @@ cslam_common_interfaces::msg::PoseGraph DecentralizedPGO::fill_pose_graph_msg(co
   
   // If logging, add extra data
   if (enable_logs_) {
+    // RCLCPP_INFO(node_->get_logger(), "It sure is.");
     logger_->fill_msg(out_msg);
   }
 
