@@ -1,16 +1,16 @@
 Panels:
   - Class: rviz_common/Displays
-    Help Height: 78
+    Help Height: 0
     Name: Displays
     Property Tree Widget:
       Expanded:
         - /Global Options1
         - /Status1
-        - /MarkerArray1
-        - /Marker1
-        - /Marker1/Status1
+        - /TF1
+        - "/PoesGraph: MarkerArray1"
+        - "/CloudMarker: Marker1"
       Splitter Ratio: 0.5
-    Tree Height: 577
+    Tree Height: 383
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
@@ -24,6 +24,11 @@ Panels:
       - /Current View1
     Name: Views
     Splitter Ratio: 0.5
+  - Class: rviz_common/Views
+    Expanded:
+      - /Current View1
+    Name: Views
+    Splitter Ratio: 0.5
 Visualization Manager:
   Class: ""
   Displays:
@@ -31,7 +36,7 @@ Visualization Manager:
       Cell Size: 1
       Class: rviz_default_plugins/Grid
       Color: 160; 160; 164
-      Enabled: false
+      Enabled: true
       Line Style:
         Line Width: 0.029999999329447746
         Value: Lines
@@ -44,32 +49,982 @@ Visualization Manager:
       Plane: XY
       Plane Cell Count: 10
       Reference Frame: <Fixed Frame>
-      Value: false
-    - Class: rviz_default_plugins/MarkerArray
+      Value: true
+    - Class: rviz_default_plugins/TF
       Enabled: true
-      Name: MarkerArray
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+        base_link:
+          Value: true
+        odom:
+          Value: true
+        robot0_current_pose:
+          Value: true
+        robot0_keyframe0:
+          Value: true
+        robot0_keyframe1:
+          Value: true
+        robot0_keyframe10:
+          Value: true
+        robot0_keyframe100:
+          Value: true
+        robot0_keyframe101:
+          Value: true
+        robot0_keyframe102:
+          Value: true
+        robot0_keyframe103:
+          Value: true
+        robot0_keyframe104:
+          Value: true
+        robot0_keyframe105:
+          Value: true
+        robot0_keyframe106:
+          Value: true
+        robot0_keyframe107:
+          Value: true
+        robot0_keyframe108:
+          Value: true
+        robot0_keyframe109:
+          Value: true
+        robot0_keyframe11:
+          Value: true
+        robot0_keyframe110:
+          Value: true
+        robot0_keyframe111:
+          Value: true
+        robot0_keyframe112:
+          Value: true
+        robot0_keyframe113:
+          Value: true
+        robot0_keyframe114:
+          Value: true
+        robot0_keyframe115:
+          Value: true
+        robot0_keyframe116:
+          Value: true
+        robot0_keyframe117:
+          Value: true
+        robot0_keyframe118:
+          Value: true
+        robot0_keyframe119:
+          Value: true
+        robot0_keyframe12:
+          Value: true
+        robot0_keyframe120:
+          Value: true
+        robot0_keyframe121:
+          Value: true
+        robot0_keyframe122:
+          Value: true
+        robot0_keyframe123:
+          Value: true
+        robot0_keyframe124:
+          Value: true
+        robot0_keyframe125:
+          Value: true
+        robot0_keyframe126:
+          Value: true
+        robot0_keyframe127:
+          Value: true
+        robot0_keyframe128:
+          Value: true
+        robot0_keyframe129:
+          Value: true
+        robot0_keyframe13:
+          Value: true
+        robot0_keyframe130:
+          Value: true
+        robot0_keyframe131:
+          Value: true
+        robot0_keyframe132:
+          Value: true
+        robot0_keyframe133:
+          Value: true
+        robot0_keyframe134:
+          Value: true
+        robot0_keyframe135:
+          Value: true
+        robot0_keyframe136:
+          Value: true
+        robot0_keyframe137:
+          Value: true
+        robot0_keyframe138:
+          Value: true
+        robot0_keyframe139:
+          Value: true
+        robot0_keyframe14:
+          Value: true
+        robot0_keyframe140:
+          Value: true
+        robot0_keyframe141:
+          Value: true
+        robot0_keyframe142:
+          Value: true
+        robot0_keyframe143:
+          Value: true
+        robot0_keyframe144:
+          Value: true
+        robot0_keyframe145:
+          Value: true
+        robot0_keyframe146:
+          Value: true
+        robot0_keyframe147:
+          Value: true
+        robot0_keyframe148:
+          Value: true
+        robot0_keyframe149:
+          Value: true
+        robot0_keyframe15:
+          Value: true
+        robot0_keyframe150:
+          Value: true
+        robot0_keyframe151:
+          Value: true
+        robot0_keyframe152:
+          Value: true
+        robot0_keyframe153:
+          Value: true
+        robot0_keyframe154:
+          Value: true
+        robot0_keyframe155:
+          Value: true
+        robot0_keyframe156:
+          Value: true
+        robot0_keyframe157:
+          Value: true
+        robot0_keyframe158:
+          Value: true
+        robot0_keyframe159:
+          Value: true
+        robot0_keyframe16:
+          Value: true
+        robot0_keyframe160:
+          Value: true
+        robot0_keyframe161:
+          Value: true
+        robot0_keyframe162:
+          Value: true
+        robot0_keyframe163:
+          Value: true
+        robot0_keyframe164:
+          Value: true
+        robot0_keyframe165:
+          Value: true
+        robot0_keyframe166:
+          Value: true
+        robot0_keyframe167:
+          Value: true
+        robot0_keyframe168:
+          Value: true
+        robot0_keyframe169:
+          Value: true
+        robot0_keyframe17:
+          Value: true
+        robot0_keyframe170:
+          Value: true
+        robot0_keyframe171:
+          Value: true
+        robot0_keyframe172:
+          Value: true
+        robot0_keyframe173:
+          Value: true
+        robot0_keyframe174:
+          Value: true
+        robot0_keyframe175:
+          Value: true
+        robot0_keyframe176:
+          Value: true
+        robot0_keyframe177:
+          Value: true
+        robot0_keyframe178:
+          Value: true
+        robot0_keyframe179:
+          Value: true
+        robot0_keyframe18:
+          Value: true
+        robot0_keyframe180:
+          Value: true
+        robot0_keyframe181:
+          Value: true
+        robot0_keyframe182:
+          Value: true
+        robot0_keyframe183:
+          Value: true
+        robot0_keyframe184:
+          Value: true
+        robot0_keyframe185:
+          Value: true
+        robot0_keyframe186:
+          Value: true
+        robot0_keyframe187:
+          Value: true
+        robot0_keyframe188:
+          Value: true
+        robot0_keyframe189:
+          Value: true
+        robot0_keyframe19:
+          Value: true
+        robot0_keyframe190:
+          Value: true
+        robot0_keyframe191:
+          Value: true
+        robot0_keyframe192:
+          Value: true
+        robot0_keyframe193:
+          Value: true
+        robot0_keyframe194:
+          Value: true
+        robot0_keyframe195:
+          Value: true
+        robot0_keyframe196:
+          Value: true
+        robot0_keyframe197:
+          Value: true
+        robot0_keyframe198:
+          Value: true
+        robot0_keyframe199:
+          Value: true
+        robot0_keyframe2:
+          Value: true
+        robot0_keyframe20:
+          Value: true
+        robot0_keyframe200:
+          Value: true
+        robot0_keyframe201:
+          Value: true
+        robot0_keyframe202:
+          Value: true
+        robot0_keyframe203:
+          Value: true
+        robot0_keyframe204:
+          Value: true
+        robot0_keyframe205:
+          Value: true
+        robot0_keyframe206:
+          Value: true
+        robot0_keyframe207:
+          Value: true
+        robot0_keyframe208:
+          Value: true
+        robot0_keyframe209:
+          Value: true
+        robot0_keyframe21:
+          Value: true
+        robot0_keyframe210:
+          Value: true
+        robot0_keyframe211:
+          Value: true
+        robot0_keyframe212:
+          Value: true
+        robot0_keyframe213:
+          Value: true
+        robot0_keyframe214:
+          Value: true
+        robot0_keyframe215:
+          Value: true
+        robot0_keyframe216:
+          Value: true
+        robot0_keyframe217:
+          Value: true
+        robot0_keyframe218:
+          Value: true
+        robot0_keyframe219:
+          Value: true
+        robot0_keyframe22:
+          Value: true
+        robot0_keyframe220:
+          Value: true
+        robot0_keyframe221:
+          Value: true
+        robot0_keyframe222:
+          Value: true
+        robot0_keyframe23:
+          Value: true
+        robot0_keyframe24:
+          Value: true
+        robot0_keyframe25:
+          Value: true
+        robot0_keyframe26:
+          Value: true
+        robot0_keyframe27:
+          Value: true
+        robot0_keyframe28:
+          Value: true
+        robot0_keyframe29:
+          Value: true
+        robot0_keyframe3:
+          Value: true
+        robot0_keyframe30:
+          Value: true
+        robot0_keyframe31:
+          Value: true
+        robot0_keyframe32:
+          Value: true
+        robot0_keyframe33:
+          Value: true
+        robot0_keyframe34:
+          Value: true
+        robot0_keyframe35:
+          Value: true
+        robot0_keyframe36:
+          Value: true
+        robot0_keyframe37:
+          Value: true
+        robot0_keyframe38:
+          Value: true
+        robot0_keyframe39:
+          Value: true
+        robot0_keyframe4:
+          Value: true
+        robot0_keyframe40:
+          Value: true
+        robot0_keyframe41:
+          Value: true
+        robot0_keyframe42:
+          Value: true
+        robot0_keyframe43:
+          Value: true
+        robot0_keyframe44:
+          Value: true
+        robot0_keyframe45:
+          Value: true
+        robot0_keyframe46:
+          Value: true
+        robot0_keyframe47:
+          Value: true
+        robot0_keyframe48:
+          Value: true
+        robot0_keyframe49:
+          Value: true
+        robot0_keyframe5:
+          Value: true
+        robot0_keyframe50:
+          Value: true
+        robot0_keyframe51:
+          Value: true
+        robot0_keyframe52:
+          Value: true
+        robot0_keyframe53:
+          Value: true
+        robot0_keyframe54:
+          Value: true
+        robot0_keyframe55:
+          Value: true
+        robot0_keyframe56:
+          Value: true
+        robot0_keyframe57:
+          Value: true
+        robot0_keyframe58:
+          Value: true
+        robot0_keyframe59:
+          Value: true
+        robot0_keyframe6:
+          Value: true
+        robot0_keyframe60:
+          Value: true
+        robot0_keyframe61:
+          Value: true
+        robot0_keyframe62:
+          Value: true
+        robot0_keyframe63:
+          Value: true
+        robot0_keyframe64:
+          Value: true
+        robot0_keyframe65:
+          Value: true
+        robot0_keyframe66:
+          Value: true
+        robot0_keyframe67:
+          Value: true
+        robot0_keyframe68:
+          Value: true
+        robot0_keyframe69:
+          Value: true
+        robot0_keyframe7:
+          Value: true
+        robot0_keyframe70:
+          Value: true
+        robot0_keyframe71:
+          Value: true
+        robot0_keyframe72:
+          Value: true
+        robot0_keyframe73:
+          Value: true
+        robot0_keyframe74:
+          Value: true
+        robot0_keyframe75:
+          Value: true
+        robot0_keyframe76:
+          Value: true
+        robot0_keyframe77:
+          Value: true
+        robot0_keyframe78:
+          Value: true
+        robot0_keyframe79:
+          Value: true
+        robot0_keyframe8:
+          Value: true
+        robot0_keyframe80:
+          Value: true
+        robot0_keyframe81:
+          Value: true
+        robot0_keyframe82:
+          Value: true
+        robot0_keyframe83:
+          Value: true
+        robot0_keyframe84:
+          Value: true
+        robot0_keyframe85:
+          Value: true
+        robot0_keyframe86:
+          Value: true
+        robot0_keyframe87:
+          Value: true
+        robot0_keyframe88:
+          Value: true
+        robot0_keyframe89:
+          Value: true
+        robot0_keyframe9:
+          Value: true
+        robot0_keyframe90:
+          Value: true
+        robot0_keyframe91:
+          Value: true
+        robot0_keyframe92:
+          Value: true
+        robot0_keyframe93:
+          Value: true
+        robot0_keyframe94:
+          Value: true
+        robot0_keyframe95:
+          Value: true
+        robot0_keyframe96:
+          Value: true
+        robot0_keyframe97:
+          Value: true
+        robot0_keyframe98:
+          Value: true
+        robot0_keyframe99:
+          Value: true
+        robot0_latest_optimized_pose:
+          Value: true
+        robot0_map:
+          Value: true
+        velodyne:
+          Value: true
+      Marker Scale: 2
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: false
+      Tree:
+        robot0_map:
+          robot0_keyframe0:
+            {}
+          robot0_keyframe1:
+            {}
+          robot0_keyframe10:
+            {}
+          robot0_keyframe100:
+            {}
+          robot0_keyframe101:
+            {}
+          robot0_keyframe102:
+            {}
+          robot0_keyframe103:
+            {}
+          robot0_keyframe104:
+            {}
+          robot0_keyframe105:
+            {}
+          robot0_keyframe106:
+            {}
+          robot0_keyframe107:
+            {}
+          robot0_keyframe108:
+            {}
+          robot0_keyframe109:
+            {}
+          robot0_keyframe11:
+            {}
+          robot0_keyframe110:
+            {}
+          robot0_keyframe111:
+            {}
+          robot0_keyframe112:
+            {}
+          robot0_keyframe113:
+            {}
+          robot0_keyframe114:
+            {}
+          robot0_keyframe115:
+            {}
+          robot0_keyframe116:
+            {}
+          robot0_keyframe117:
+            {}
+          robot0_keyframe118:
+            {}
+          robot0_keyframe119:
+            {}
+          robot0_keyframe12:
+            {}
+          robot0_keyframe120:
+            {}
+          robot0_keyframe121:
+            {}
+          robot0_keyframe122:
+            {}
+          robot0_keyframe123:
+            {}
+          robot0_keyframe124:
+            {}
+          robot0_keyframe125:
+            {}
+          robot0_keyframe126:
+            {}
+          robot0_keyframe127:
+            {}
+          robot0_keyframe128:
+            {}
+          robot0_keyframe129:
+            {}
+          robot0_keyframe13:
+            {}
+          robot0_keyframe130:
+            {}
+          robot0_keyframe131:
+            {}
+          robot0_keyframe132:
+            {}
+          robot0_keyframe133:
+            {}
+          robot0_keyframe134:
+            {}
+          robot0_keyframe135:
+            {}
+          robot0_keyframe136:
+            {}
+          robot0_keyframe137:
+            {}
+          robot0_keyframe138:
+            {}
+          robot0_keyframe139:
+            {}
+          robot0_keyframe14:
+            {}
+          robot0_keyframe140:
+            {}
+          robot0_keyframe141:
+            {}
+          robot0_keyframe142:
+            {}
+          robot0_keyframe143:
+            {}
+          robot0_keyframe144:
+            {}
+          robot0_keyframe145:
+            {}
+          robot0_keyframe146:
+            {}
+          robot0_keyframe147:
+            {}
+          robot0_keyframe148:
+            {}
+          robot0_keyframe149:
+            {}
+          robot0_keyframe15:
+            {}
+          robot0_keyframe150:
+            {}
+          robot0_keyframe151:
+            {}
+          robot0_keyframe152:
+            {}
+          robot0_keyframe153:
+            {}
+          robot0_keyframe154:
+            {}
+          robot0_keyframe155:
+            {}
+          robot0_keyframe156:
+            {}
+          robot0_keyframe157:
+            {}
+          robot0_keyframe158:
+            {}
+          robot0_keyframe159:
+            {}
+          robot0_keyframe16:
+            {}
+          robot0_keyframe160:
+            {}
+          robot0_keyframe161:
+            {}
+          robot0_keyframe162:
+            {}
+          robot0_keyframe163:
+            {}
+          robot0_keyframe164:
+            {}
+          robot0_keyframe165:
+            {}
+          robot0_keyframe166:
+            {}
+          robot0_keyframe167:
+            {}
+          robot0_keyframe168:
+            {}
+          robot0_keyframe169:
+            {}
+          robot0_keyframe17:
+            {}
+          robot0_keyframe170:
+            {}
+          robot0_keyframe171:
+            {}
+          robot0_keyframe172:
+            {}
+          robot0_keyframe173:
+            {}
+          robot0_keyframe174:
+            {}
+          robot0_keyframe175:
+            {}
+          robot0_keyframe176:
+            {}
+          robot0_keyframe177:
+            {}
+          robot0_keyframe178:
+            {}
+          robot0_keyframe179:
+            {}
+          robot0_keyframe18:
+            {}
+          robot0_keyframe180:
+            {}
+          robot0_keyframe181:
+            {}
+          robot0_keyframe182:
+            {}
+          robot0_keyframe183:
+            {}
+          robot0_keyframe184:
+            {}
+          robot0_keyframe185:
+            {}
+          robot0_keyframe186:
+            {}
+          robot0_keyframe187:
+            {}
+          robot0_keyframe188:
+            {}
+          robot0_keyframe189:
+            {}
+          robot0_keyframe19:
+            {}
+          robot0_keyframe190:
+            {}
+          robot0_keyframe191:
+            {}
+          robot0_keyframe192:
+            {}
+          robot0_keyframe193:
+            {}
+          robot0_keyframe194:
+            {}
+          robot0_keyframe195:
+            {}
+          robot0_keyframe196:
+            {}
+          robot0_keyframe197:
+            {}
+          robot0_keyframe198:
+            {}
+          robot0_keyframe199:
+            {}
+          robot0_keyframe2:
+            {}
+          robot0_keyframe20:
+            {}
+          robot0_keyframe200:
+            {}
+          robot0_keyframe201:
+            {}
+          robot0_keyframe202:
+            {}
+          robot0_keyframe203:
+            {}
+          robot0_keyframe204:
+            {}
+          robot0_keyframe205:
+            {}
+          robot0_keyframe206:
+            {}
+          robot0_keyframe207:
+            {}
+          robot0_keyframe208:
+            {}
+          robot0_keyframe209:
+            {}
+          robot0_keyframe21:
+            {}
+          robot0_keyframe210:
+            {}
+          robot0_keyframe211:
+            {}
+          robot0_keyframe212:
+            {}
+          robot0_keyframe213:
+            {}
+          robot0_keyframe214:
+            {}
+          robot0_keyframe215:
+            {}
+          robot0_keyframe216:
+            {}
+          robot0_keyframe217:
+            {}
+          robot0_keyframe218:
+            {}
+          robot0_keyframe219:
+            {}
+          robot0_keyframe22:
+            {}
+          robot0_keyframe220:
+            {}
+          robot0_keyframe221:
+            {}
+          robot0_keyframe222:
+            {}
+          robot0_keyframe23:
+            {}
+          robot0_keyframe24:
+            {}
+          robot0_keyframe25:
+            {}
+          robot0_keyframe26:
+            {}
+          robot0_keyframe27:
+            {}
+          robot0_keyframe28:
+            {}
+          robot0_keyframe29:
+            {}
+          robot0_keyframe3:
+            {}
+          robot0_keyframe30:
+            {}
+          robot0_keyframe31:
+            {}
+          robot0_keyframe32:
+            {}
+          robot0_keyframe33:
+            {}
+          robot0_keyframe34:
+            {}
+          robot0_keyframe35:
+            {}
+          robot0_keyframe36:
+            {}
+          robot0_keyframe37:
+            {}
+          robot0_keyframe38:
+            {}
+          robot0_keyframe39:
+            {}
+          robot0_keyframe4:
+            {}
+          robot0_keyframe40:
+            {}
+          robot0_keyframe41:
+            {}
+          robot0_keyframe42:
+            {}
+          robot0_keyframe43:
+            {}
+          robot0_keyframe44:
+            {}
+          robot0_keyframe45:
+            {}
+          robot0_keyframe46:
+            {}
+          robot0_keyframe47:
+            {}
+          robot0_keyframe48:
+            {}
+          robot0_keyframe49:
+            {}
+          robot0_keyframe5:
+            {}
+          robot0_keyframe50:
+            {}
+          robot0_keyframe51:
+            {}
+          robot0_keyframe52:
+            {}
+          robot0_keyframe53:
+            {}
+          robot0_keyframe54:
+            {}
+          robot0_keyframe55:
+            {}
+          robot0_keyframe56:
+            {}
+          robot0_keyframe57:
+            {}
+          robot0_keyframe58:
+            {}
+          robot0_keyframe59:
+            {}
+          robot0_keyframe6:
+            {}
+          robot0_keyframe60:
+            {}
+          robot0_keyframe61:
+            {}
+          robot0_keyframe62:
+            {}
+          robot0_keyframe63:
+            {}
+          robot0_keyframe64:
+            {}
+          robot0_keyframe65:
+            {}
+          robot0_keyframe66:
+            {}
+          robot0_keyframe67:
+            {}
+          robot0_keyframe68:
+            {}
+          robot0_keyframe69:
+            {}
+          robot0_keyframe7:
+            {}
+          robot0_keyframe70:
+            {}
+          robot0_keyframe71:
+            {}
+          robot0_keyframe72:
+            {}
+          robot0_keyframe73:
+            {}
+          robot0_keyframe74:
+            {}
+          robot0_keyframe75:
+            {}
+          robot0_keyframe76:
+            {}
+          robot0_keyframe77:
+            {}
+          robot0_keyframe78:
+            {}
+          robot0_keyframe79:
+            {}
+          robot0_keyframe8:
+            {}
+          robot0_keyframe80:
+            {}
+          robot0_keyframe81:
+            {}
+          robot0_keyframe82:
+            {}
+          robot0_keyframe83:
+            {}
+          robot0_keyframe84:
+            {}
+          robot0_keyframe85:
+            {}
+          robot0_keyframe86:
+            {}
+          robot0_keyframe87:
+            {}
+          robot0_keyframe88:
+            {}
+          robot0_keyframe89:
+            {}
+          robot0_keyframe9:
+            {}
+          robot0_keyframe90:
+            {}
+          robot0_keyframe91:
+            {}
+          robot0_keyframe92:
+            {}
+          robot0_keyframe93:
+            {}
+          robot0_keyframe94:
+            {}
+          robot0_keyframe95:
+            {}
+          robot0_keyframe96:
+            {}
+          robot0_keyframe97:
+            {}
+          robot0_keyframe98:
+            {}
+          robot0_keyframe99:
+            {}
+          robot0_latest_optimized_pose:
+            robot0_current_pose:
+              {}
+      Update Interval: 0
+      Value: true
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: false
+      Name: "PoesGraph: MarkerArray"
       Namespaces:
-        edges: true
-        poses: true
+        {}
       Topic:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /cslam/viz/pose_graph_markers
-      Value: true
+      Value: false
     - Class: rviz_default_plugins/Marker
-      Enabled: true
-      Name: Marker
+      Enabled: false
+      Name: "CloudMarker: Marker"
       Namespaces:
-        keypoints_robot0: true
-        keypoints_robot1: true
+        {}
       Topic:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
         Value: /cslam/viz/cloudmarker
+      Value: false
+    - Alpha: 1
+      Axes Length: 1
+      Axes Radius: 0.10000000149011612
+      Class: rviz_default_plugins/Pose
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 0.800000011920929
+      Head Radius: 1
+      Name: Pose
+      Shaft Length: 1
+      Shaft Radius: 0.5
+      Shape: Arrow
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /r0/cslam/current_pose_estimate
+      Value: true
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /cslam/viz/keypoints_markers
       Value: true
   Enabled: true
   Global Options:
@@ -114,39 +1069,39 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 214.238525390625
+      Distance: 29.116212844848633
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: -0.00033646219526417553
+        Y: 0.002775491215288639
+        Z: -0.0004416571173351258
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.9103981256484985
-      Target Frame: <Fixed Frame>
+      Pitch: 0.889796793460846
+      Target Frame: robot0_current_pose
       Value: Orbit (rviz)
-      Yaw: 0.595391035079956
+      Yaw: 5.805406093597412
     Saved: ~
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 806
+  Height: 704
   Hide Left Dock: false
   Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd000000040000000000000253000002ccfc0200000008fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000002cc000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261000000010000010f000002ccfc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073010000003d000002cc000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000004420000003efc0100000002fb0000000800540069006d00650100000000000004420000000000000000fb0000000800540069006d00650100000000000004500000000000000000000002d6000002cc00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd00000003000000000000015600000266fc0200000009fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c006100790073010000003d000001bc000000c900fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000000a0056006900650077007301000001ff000000a4000000a400ffffff000000010000010f00000266fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a00560069006500770073000000003d00000266000000a400fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b2000000000000000000000003000004420000003efc0100000002fb0000000800540069006d00650100000000000004420000000000000000fb0000000800540069006d006501000000000000045000000000000000000000025c0000026600000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Tool Properties:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1604
-  X: 159
-  Y: 87
+  Width: 952
+  X: 72
+  Y: 27

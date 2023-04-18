@@ -26,7 +26,7 @@ class SGPRMatching(object):
         self.device = self.params['torch_device']
         
         # Set of graphs and associated IDs
-        self.graphs = torch.tensor()
+        self.graphs = torch.tensor([], device=self.device, dtype=float)
         self.item_ids = dict()
         self.nb_items = 0
 
@@ -47,7 +47,7 @@ class SGPRMatching(object):
         
         # Create model, to have state loaded
         number_of_labels = self.params['frontend.sg_pr.graph.number_of_labels']
-        self.model = SG(self.args, number_of_labels)
+        self.model = SG(args, number_of_labels, self.device)
         
         # Load model state
         model_file = self.params['frontend.sg_pr.model']
@@ -83,7 +83,7 @@ class SGPRMatching(object):
 
         descriptor_torch = torch.FloatTensor(descriptor, device=self.device)
         
-        self.graphs = self.graphs.cat(descriptor_torch)
+        self.graphs = torch.cat([self.graphs,descriptor_torch])
 
         self.item_ids[self.nb_items] = item_id
         self.nb_items += 1

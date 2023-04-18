@@ -38,5 +38,5 @@
       enable_sparsification_comparison: true
       enable_pose_timestamps_recording: true
     visualization:
-      enable: false
+      enable: true
       publishing_period_ms: 1000

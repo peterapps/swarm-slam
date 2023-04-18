@@ -73,7 +73,7 @@ def launch_setup(context, *args, **kwargs):
 
     bag_file = os.path.join(
             get_package_share_directory("cslam_experiments"), "data",
-            dataset)
+            dataset, dataset + ".db3")
     bag_proc = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 os.path.join(
@@ -101,7 +101,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         DeclareLaunchArgument('max_nb_robots', default_value='3'),
-        DeclareLaunchArgument('sequence', default_value='Playground'),
+        DeclareLaunchArgument('sequence', default_value='Playground_2'),
         DeclareLaunchArgument('launch_delay_s', default_value='10', description="Delay between launching the bag and the robot. In order to let the robot initialize properly and not loose the first bag data frames."),
         DeclareLaunchArgument('config_file',
                               default_value='s3e_stereo_and_lidar.yaml',
