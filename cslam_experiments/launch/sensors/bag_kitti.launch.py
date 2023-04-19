@@ -52,19 +52,19 @@ def launch_setup(context, *args, **kwargs):
             ns + '/imu/data',
             '/imu_in',
             '/imu_out'),
-        ('/tf_static',
-            ns + '/tf_static',
-            '/tf_static_in',
-            '/tf_static_out'),
-        ('/tf',
-            ns + '/tf',
-            '/tf_in',
-            '/tf_out')
+        # ('/tf_static',
+        #     ns + '/tf_static',
+        #     '/tf_static_in',
+        #     '/tf_static_out'),
+        # ('/tf',
+        #     ns + '/tf',
+        #     '/tf_in',
+        #     '/tf_out')
     ]
     bag_remap = []
     util_remap = []
     for old, new, util_in, util_out in remappings:
-        if util_in is not None:
+        if False and util_in is not None:
             bag_remap.append((old, new + '_raw'))
             util_remap.append((util_in, new + '_raw'))
             util_remap.append((util_out, new))
@@ -100,15 +100,15 @@ def launch_setup(context, *args, **kwargs):
 
     return [
         *launch_args,
-        Node(
-            package='kitti_utils',
-            executable='kitti_remap_time',
-            name='kitti_remap_time_' + ns[1:],
-            remappings=util_remap,
-            parameters=[
-                {'offset_sec': LaunchConfiguration('remap_time_offset')}
-            ]
-        ),
+        # Node(
+        #     package='kitti_utils',
+        #     executable='kitti_remap_time',
+        #     name='kitti_remap_time_' + ns[1:],
+        #     remappings=util_remap,
+        #     parameters=[
+        #         {'offset_sec': LaunchConfiguration('remap_time_offset')}
+        #     ]
+        # ),
         TimerAction(
             period=LaunchConfiguration('bag_start_delay'),
             actions=[
