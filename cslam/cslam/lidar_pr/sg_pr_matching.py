@@ -37,7 +37,7 @@ class SGPRMatching(object):
         self.device = self.params['torch_device']
         
         # Set of graphs and associated IDs
-        self.graphs = torch.tensor([], device=self.device, dtype=float)
+        self.graphs = torch.tensor([], device=self.device, dtype=torch.float32)
         self.item_ids = dict()
         self.nb_items = 0
 
@@ -59,6 +59,7 @@ class SGPRMatching(object):
         
         # Create model, to have state loaded
         number_of_labels = self.params['frontend.sg_pr.graph.number_of_labels']
+        self.node_num = self.params['frontend.sg_pr.graph.node_num']
         self.model = SG(args, number_of_labels, self.device)
         
         # Load model state
@@ -95,9 +96,9 @@ class SGPRMatching(object):
             item_id: identification info (e.g., int)
         """
 
-        descriptor_torch = torch.FloatTensor(descriptor, device=self.device)
+        descriptor_torch = torch.FloatTensor(descriptor, device=self.device).reshape(-1, self.node_num).unsqueeze(0)
         
-        self.graphs = torch.cat([self.graphs,descriptor_torch])
+        self.graphs = torch.cat([self.graphs,descriptor_torch], dim=0).to(dtype=torch.float32)
 
         self.item_ids[self.nb_items] = item_id
         self.nb_items += 1
@@ -135,11 +136,14 @@ class SGPRMatching(object):
 
         data = dict()
         data["features_1"] = self.graphs
-        data["features_2"] = torch.FloatTensor(query, device=self.device).repeat(graph_shape)
+        data["features_2"] = torch.FloatTensor(query, device=self.device).reshape(-1,self.node_num).unsqueeze(0).repeat(graph_shape, 1, 1)
+
+        assert data["features_1"].dtype == torch.float32
+        assert data["features_2"].dtype == torch.float32
 
         scores, att_weights_1, att_weights_2 = self.model(data)
         
-        scores_topk, idx_topk = torch.topk(scores, k)
+        scores_topk, idx_topk = torch.topk(scores, min(k, graph_shape))
 
         scores_topk_numpy = scores_topk.cpu().detach().numpy()
         idx_topk_numpy = idx_topk.cpu().detach().numpy()

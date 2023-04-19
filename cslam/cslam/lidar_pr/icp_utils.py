@@ -16,6 +16,14 @@ FIELDS_XYZ = [
     PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
 ]
 
+FIELDS_XYZI_LABEL = [
+    PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
+    PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
+    PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
+    PointField(name='i', offset=12, datatype=PointField.FLOAT32, count=1),
+    PointField(name='label', offset=16, datatype=PointField.FLOAT32, count=1),
+]
+
 # Partially adapted from https://github.com/MIT-SPARK/TEASER-plusplus/tree/master/examples/teaser_python_fpfh_icp
 
 
@@ -93,11 +101,10 @@ def Rt2T(R, t):
 def downsample(points, voxel_size):
     open3d_cloud = open3d.geometry.PointCloud()
     open3d_cloud.points = open3d.utility.Vector3dVector(points)
-    cloud_downsampled, indices = open3d.geometry.voxel_down_sample_and_trace(open3d_cloud,
-                                                                             voxel_size, 
+    cloud_downsampled, indices, _ = open3d_cloud.voxel_down_sample_and_trace(voxel_size, 
                                                                              open3d_cloud.get_min_bound(),
                                                                              open3d_cloud.get_max_bound())
-    return cloud_downsampled, indices
+    return cloud_downsampled, np.max(indices, axis=1)
 
 
 def solve_teaser(src, dst, voxel_size, min_inliers):
@@ -157,6 +164,13 @@ def open3d_to_ros(open3d_cloud):
     header = Header()
     fields = FIELDS_XYZ
     points = np.asarray(open3d_cloud.points)
+    return pc2_utils.create_cloud(header, fields, points)
+
+def open3d_to_ros_semantic(open3d_cloud, labels, intensities):
+    header = Header()
+    fields = FIELDS_XYZI_LABEL
+    points = np.asarray(open3d_cloud.points)
+    points = np.hstack([points, intensities, labels])
     return pc2_utils.create_cloud(header, fields, points)
 
 

@@ -101,7 +101,6 @@ class GlobalDescriptorLoopClosureDetection(object):
                 KeyframePointCloud, 'cslam/keyframe_data', self.receive_keyframe,
                 100)
         elif self.keyframe_type == "semantic-pointcloud":
-            # TODO: What kind of message Peter?
             self.receive_keyframe_subscriber = self.node.create_subscription(
                 KeyframePointCloud, 'cslam/keyframe_data', self.receive_keyframe,
                 100)
@@ -420,8 +419,8 @@ class GlobalDescriptorLoopClosureDetection(object):
             # This will be using SG_PR
             cloud = msg.pointcloud
 
-            field_names = [field.name for field in cloud.fields if field.name in ['x', 'y', 'z', 'label']]
-            self.node.get_logger().info('field_names: '+str(field_names)+'  vs.  cloud.fields: '+str(cloud.fields))
+            field_names = [field.name for field in cloud.fields if field.name in ['x', 'y', 'z', 'i','label']]
+            # self.node.get_logger().info('field_names: '+str(field_names)+'  vs.  cloud.fields: '+str(cloud.fields))
             
             structured_numpy_array = pc2_utils.read_points(
                 cloud, field_names, skip_nans=False, uvs=None, reshape_organized_cloud=None)
@@ -429,11 +428,12 @@ class GlobalDescriptorLoopClosureDetection(object):
             from numpy.lib.recfunctions import structured_to_unstructured
             unstructured_numpy_array = structured_to_unstructured(structured_numpy_array)
 
-            embedding = self.global_descriptor.compute_embedding(unstructured_numpy_array)
-            # embedding = self.global_descriptor.compute_embedding(
-            #     pc2_utils.read_points_numpy(msg.pointcloud, ['x', 'y', 'z', 'label']))
+            
+            # self.node.get_logger().info('unstructured_numpy_array shape: '+str(unstructured_numpy_array.shape))
+            
 
-                # icp_utils.ros_pointcloud_to_points(msg.pointcloud))
+            embedding = self.global_descriptor.compute_embedding(unstructured_numpy_array)
+            embedding = embedding.astype(np.float64)
 
         self.add_global_descriptor_to_map(embedding, msg.id)
 

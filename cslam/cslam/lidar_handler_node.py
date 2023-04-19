@@ -7,6 +7,8 @@ from cslam_common_interfaces.msg import KeyframeOdom, KeyframePointCloud
 from cslam_common_interfaces.msg import LocalDescriptorsRequest, LocalPointCloudDescriptors, InterRobotLoopClosure, IntraRobotLoopClosure, LocalKeyframeMatch
 from cslam_common_interfaces.msg import VizPointCloud
 import cslam.lidar_pr.icp_utils as icp_utils
+import cslam.utils.point_cloud2 as pc2_utils
+
 import rclpy
 from rclpy.node import Node
 from rclpy.clock import Clock
@@ -171,8 +173,19 @@ class LidarHandler:
             if self.generate_new_keyframe(data):
                 try:
                     cloud_open3d_downsampled, indices = icp_utils.downsample_ros_pointcloud(data[0], self.params["frontend.voxel_size"])
-                    self.node.get_logger().info("Downsampled cloud using indices {}.".format(str(indices.shape)))
+                    
                     self.local_descriptors_map[self.nb_local_keyframes] = cloud_open3d_downsampled
+                    
+                    if self.params['frontend.sensor_type'] == 'semantic-lidar':
+                        
+                        labels = pc2_utils.structured_to_unstructured(pc2_utils.read_points(data[0], ['label']))
+                        labels = labels[indices]
+
+                        intensities = pc2_utils.structured_to_unstructured(pc2_utils.read_points(data[0], ['i']))
+                        intensities = intensities[indices]
+
+                        # self.node.get_logger().info("Downsampled cloud using indices {} with type {}.".format(str(labels.shape), labels.dtype))
+
                 except Exception as e:
                     self.local_descriptors_map[self.nb_local_keyframes] = []
                     self.node.get_logger().info("Failure to downsample point cloud to voxel size {}. {}".format(self.params["frontend.voxel_size"], e))
@@ -180,7 +193,11 @@ class LidarHandler:
                 # Publish pointcloud
                 msg_pointcloud = KeyframePointCloud()
                 msg_pointcloud.id = self.nb_local_keyframes
-                msg_pointcloud.pointcloud = icp_utils.open3d_to_ros(self.local_descriptors_map[self.nb_local_keyframes])
+                if self.params['frontend.sensor_type'] == 'semantic-lidar':
+                    msg_pointcloud.pointcloud = icp_utils.open3d_to_ros_semantic(self.local_descriptors_map[self.nb_local_keyframes], labels, intensities)
+                else:
+                    msg_pointcloud.pointcloud = icp_utils.open3d_to_ros(self.local_descriptors_map[self.nb_local_keyframes])
+                # self.node.get_logger().info('cloud.fields: '+str(msg_pointcloud.pointcloud.fields))
                 self.keyframe_pointcloud_publisher.publish(msg_pointcloud)
                 # Publish odom
                 msg_odom = KeyframeOdom()
@@ -216,8 +233,11 @@ if __name__ == '__main__':
                         ('evaluation.gps_topic', ""),            
                         ('evaluation.gps_topic', ""),        
                         ('visualization.enable', False),
+                        ('frontend.sensor_type', 'lidar')
                         ])
     params = {}
+    params['frontend.sensor_type'] = node.get_parameter(
+        'frontend.sensor_type').value 
     params['frontend.pointcloud_topic'] = node.get_parameter(
         'frontend.pointcloud_topic').value 
     params['frontend.odom_topic'] = node.get_parameter(
