@@ -69,10 +69,17 @@ pip3 install .
 cd ~/Documents
 sudo apt install libpcl-dev libyaml-cpp-dev
 git clone https://github.com/lilin-hitcrt/SSC.git
+cd SSC
 mkdir build
 cd build
 cmake ..
 make
+
+# Miscellaneous dependencies
+pip3 install distinctipy
+pip3 install numpy-quaternion
+sudo apt install -y python3-pcl pcl-tools
+pip3 install rosbags
 
 echo "source ~/rob530_setup.bash" >> ~/.bashrc
 
