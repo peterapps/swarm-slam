@@ -79,7 +79,10 @@ class LoopClosureSparseMatching(object):
     def match_local_loop_closures(self, descriptor, kf_id):
         kfs, similarities = self.local_nnsm.search(descriptor,
                                          k=self.params['frontend.nb_best_matches'])
+        
+        # return None, similarities[0]
 
+        max_similarity = 0.
         if len(kfs) > 0 and kfs[0] == kf_id:
             kfs, similarities = kfs[1:], similarities[1:]
         if len(kfs) == 0:
@@ -89,12 +92,15 @@ class LoopClosureSparseMatching(object):
             if abs(kf -
                    kf_id) < self.params['frontend.intra_loop_min_inbetween_keyframes']:
                 continue
+            
+            if similarity > max_similarity:
+                max_similarity = similarity
 
             if similarity < self.params['frontend.similarity_threshold']:
                 continue
 
-            return kf, kfs
-        return None, None
+            return kf, max_similarity
+        return None, max_similarity
 
     def select_candidates(self,
                           number_of_candidates,

@@ -312,8 +312,8 @@ class GlobalDescriptorLoopClosureDetection(object):
         """
         
         if self.params['frontend.enable_intra_robot_loop_closures']:
-            kf_match, _ = self.lcm.match_local_loop_closures(embedding, kf_id)
-            self.node.get_logger().info("Checking for intra loop closure: " + str(kf_match))
+            kf_match, max_similarity = self.lcm.match_local_loop_closures(embedding, kf_id)
+            self.node.get_logger().info("Checking for intra loop closure: kf score "+ str(max_similarity))
             if kf_match is not None:
                 msg = LocalKeyframeMatch()
                 msg.keyframe0_id = kf_id
