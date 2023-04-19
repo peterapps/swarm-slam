@@ -39,10 +39,10 @@ ament_target_dependencies(kitti_remap_time rclcpp rmw sensor_msgs geometry_msgs 
 install(TARGETS kitti_remap_time
   DESTINATION lib/${PROJECT_NAME})
 
-install(DIRECTORY
-  launch
-  DESTINATION share/${PROJECT_NAME}/
-)
+# install(DIRECTORY
+#   launch
+#   DESTINATION share/${PROJECT_NAME}/
+# )
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
