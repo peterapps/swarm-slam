@@ -1,8 +1,5 @@
 import unittest
 
-import sys
-sys.path.append('/home/lajoiepy/Documents/projects/c-slam/c-slam-ws/install/cslam/lib/python3.8/site-packages/')
-
 from cslam.algebraic_connectivity_maximization import AlgebraicConnectivityMaximization, EdgeInterRobot
 from cslam.mac.utils import Edge
 from cslam.mac.mac import MAC

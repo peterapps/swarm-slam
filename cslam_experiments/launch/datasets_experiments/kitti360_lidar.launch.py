@@ -47,6 +47,7 @@ def launch_setup(context, *args, **kwargs):
                 "enable_simulated_rendezvous": LaunchConfiguration('enable_simulated_rendezvous'),
                 "rendezvous_schedule_file": os.path.join(get_package_share_directory("cslam_experiments"),
                              "config", "rendezvous", LaunchConfiguration('rendezvous_config').perform(context)),
+                'remap_time_offset': '0.0' if i == 0 else '-602.469# '-252.469'
             }.items(),
         )
 
@@ -141,12 +142,13 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('max_nb_robots', default_value='2'),
         DeclareLaunchArgument('sequence', default_value='360-Semantic-00'),
-        DeclareLaunchArgument('robot_delay_s', default_value='605', description="Delay between launching each robot. Ajust depending on the computing power of your machine."),
+        DeclareLaunchArgument('robot_delay_s', default_value='0', description="Delay between launching each robot. Ajust depending on the computing power of your machine."),
         DeclareLaunchArgument('launch_delay_s', default_value='10', description="Delay between launching the bag and the robot. In order to let the robot initialize properly and not loose the first bag data frames."),
         DeclareLaunchArgument('config_file',
                               default_value='semantic_kitti_lidar.yaml',
                               description=''),
         DeclareLaunchArgument('rate', default_value='0.5'),
+        DeclareLaunchArgument('read_ahead_queue_size', default_value='None'),
         DeclareLaunchArgument('enable_simulated_rendezvous', default_value='true'),
         DeclareLaunchArgument('rendezvous_config', default_value='kitti00_2robots_lidar.config'),
         OpaqueFunction(function=launch_setup)
