@@ -1,4 +1,6 @@
-# Swarm-SLAM
+# Semantic Swarm-SLAM
+
+![Semantic Swarm-SLAM System Architecture](media/system_architecture.png)
 
 A full ROS 2 Foxy development environment in a Ubuntu 20.04 virtual machine or Docker container, capable of running [Swarm-SLAM](https://github.com/MISTLab/Swarm-SLAM).
 
