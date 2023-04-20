@@ -40,6 +40,7 @@ class SGPRMatching(object):
         self.graphs = torch.tensor([], device=self.device, dtype=torch.float32)
         self.item_ids = dict()
         self.nb_items = 0
+        self.nb_added = 0
 
         # SG-PR initialization
         
@@ -96,12 +97,19 @@ class SGPRMatching(object):
             item_id: identification info (e.g., int)
         """
 
-        descriptor_torch = torch.FloatTensor(descriptor, device=self.device).reshape(-1, self.node_num).unsqueeze(0)
-        
-        self.graphs = torch.cat([self.graphs,descriptor_torch], dim=0).to(dtype=torch.float32)
+        if self.nb_added % 5 == 0:
 
-        self.item_ids[self.nb_items] = item_id
-        self.nb_items += 1
+
+            descriptor_torch = torch.FloatTensor(descriptor, device=self.device).reshape(-1, self.node_num).unsqueeze(0)
+            
+            self.graphs = torch.cat([self.graphs,descriptor_torch], dim=0).to(dtype=torch.float32)
+
+            self.item_ids[self.nb_items] = item_id
+            self.nb_items += 1
+
+            self.nb_added = 0
+
+        self.nb_added += 1
 
         # sc = descriptor.reshape(self.shape)
 

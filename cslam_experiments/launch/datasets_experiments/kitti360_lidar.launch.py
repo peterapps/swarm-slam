@@ -142,7 +142,7 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('max_nb_robots', default_value='2'),
         DeclareLaunchArgument('sequence', default_value='360-Semantic-00'),
-        DeclareLaunchArgument('robot_delay_s', default_value='660', description="Delay between launching each robot. Ajust depending on the computing power of your machine."), # 602.469 for exact time of bag, 0 to run simultaneously 
+        DeclareLaunchArgument('robot_delay_s', default_value='1000', description="Delay between launching each robot. Ajust depending on the computing power of your machine."), # 602.469 for exact time of bag, 0 to run simultaneously 
         DeclareLaunchArgument('launch_delay_s', default_value='10', description="Delay between launching the bag and the robot. In order to let the robot initialize properly and not loose the first bag data frames."),
         DeclareLaunchArgument('config_file',
                               default_value='semantic_kitti_lidar.yaml',

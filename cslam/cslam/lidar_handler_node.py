@@ -194,7 +194,7 @@ class LidarHandler:
                 msg_pointcloud = KeyframePointCloud()
                 msg_pointcloud.id = self.nb_local_keyframes
                 if self.params['frontend.sensor_type'] == 'semantic-lidar':
-                    msg_pointcloud.pointcloud = icp_utils.open3d_to_ros_semantic(self.local_descriptors_map[self.nb_local_keyframes], labels, intensities)
+                    msg_pointcloud.pointcloud = data[0] # icp_utils.open3d_to_ros_semantic(self.local_descriptors_map[self.nb_local_keyframes], labels, intensities)
                 else:
                     msg_pointcloud.pointcloud = icp_utils.open3d_to_ros(self.local_descriptors_map[self.nb_local_keyframes])
                 # self.node.get_logger().info('cloud.fields: '+str(msg_pointcloud.pointcloud.fields))
