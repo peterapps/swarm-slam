@@ -150,6 +150,13 @@ namespace cslam
             }
         }
 
+        if (initial_global_pose_graph_.first != nullptr && initial_global_pose_graph_.second != nullptr)
+        {
+            float total_error_initial = compute_error(initial_global_pose_graph_.first,
+                                              initial_global_pose_graph_.second);
+            optimization_log_file << "total_error_initial," << std::to_string(total_error_initial) << std::endl;
+        }
+
         optimization_log_file.close();
 
         // Write gps logs (.csv)

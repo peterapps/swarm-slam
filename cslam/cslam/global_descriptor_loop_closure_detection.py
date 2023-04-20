@@ -101,7 +101,6 @@ class GlobalDescriptorLoopClosureDetection(object):
                 KeyframePointCloud, 'cslam/keyframe_data', self.receive_keyframe,
                 100)
         elif self.keyframe_type == "semantic-pointcloud":
-            # TODO: What kind of message Peter?
             self.receive_keyframe_subscriber = self.node.create_subscription(
                 KeyframePointCloud, 'cslam/keyframe_data', self.receive_keyframe,
                 100)
@@ -313,8 +312,8 @@ class GlobalDescriptorLoopClosureDetection(object):
         """
         
         if self.params['frontend.enable_intra_robot_loop_closures']:
-            kf_match, _ = self.lcm.match_local_loop_closures(embedding, kf_id)
-            self.node.get_logger().info("Checking for intra loop closure: " + str(kf_match))
+            kf_match, max_similarity = self.lcm.match_local_loop_closures(embedding, kf_id)
+            self.node.get_logger().info("Checking for intra loop closure: kf score "+ str(max_similarity))
             if kf_match is not None:
                 msg = LocalKeyframeMatch()
                 msg.keyframe0_id = kf_id
@@ -420,18 +419,16 @@ class GlobalDescriptorLoopClosureDetection(object):
             # This will be using SG_PR
             cloud = msg.pointcloud
 
-            field_names = [field.name for field in cloud.fields if field.name in ['x', 'y', 'z', 'label']]
+            field_names = [field.name for field in cloud.fields if field.name in ['x', 'y', 'z', 'i','label']]
+            
             structured_numpy_array = pc2_utils.read_points(
                 cloud, field_names, skip_nans=False, uvs=None, reshape_organized_cloud=None)
+            
             from numpy.lib.recfunctions import structured_to_unstructured
-            unstructured_numpy_array = structured_to_unstructured(structured_numpy_array)
+            unstructured_numpy_array = structured_to_unstructured(structured_numpy_array)            
 
             embedding = self.global_descriptor.compute_embedding(unstructured_numpy_array)
-            # embedding = self.global_descriptor.compute_embedding(
-            #     pc2_utils.read_points_numpy(msg.pointcloud, ['x', 'y', 'z', 'label']))
-            
-            embedding = self.global_descriptor.compute_embedding(
-                icp_utils.ros_pointcloud_to_points(msg.pointcloud))
+            embedding = embedding.astype(np.float64)
 
         self.add_global_descriptor_to_map(embedding, msg.id)
 

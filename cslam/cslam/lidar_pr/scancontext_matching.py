@@ -67,13 +67,26 @@ class ScanContextMatching(object):
 
         # step 2        
         nn_dist = 1.0 # initialize with the largest value of distance
+        best_dist = 1.0
         nn_idx = None
+        best_idx = None
         nn_yawdiff = None
+        best_yawdiff = None
         for ith in range(self.num_candidates):
             candidate_idx = nncandidates_idx[ith]
             candidate_sc = self.scancontexts[candidate_idx]
             dist, yaw_diff = sc_utils.distance_sc(candidate_sc, query_sc)
-            if(dist < nn_dist):
+            if(dist < best_dist and dist != 0.0):
+                
+                nn_dist = best_dist # now second best
+                nn_yawdiff = best_yawdiff
+                nn_idx = best_idx
+                
+                best_dist = dist # new best
+                best_yawdiff = yaw_diff
+                best_idx = candidate_idx
+
+            elif dist < nn_dist:
                 nn_dist = dist
                 nn_yawdiff = yaw_diff
                 nn_idx = candidate_idx
@@ -84,7 +97,8 @@ class ScanContextMatching(object):
             similarity = 0.0
         else:
             nn_yawdiff_deg = nn_yawdiff * (360/self.shape[1])
-            similarity = 1 - nn_dist # For now we return only 1 match, but we could return the n best matches
+            similarity = 1. - nn_dist # For now we return only 1 match, but we could return the n best matches
+        
         return [self.items[nn_idx]], [similarity]
 
     def search_best(self, query) -> Tuple[int, np.ndarray]:
